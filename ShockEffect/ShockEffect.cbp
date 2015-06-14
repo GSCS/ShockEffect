@@ -37,6 +37,7 @@
 			<Add option="-fexceptions" />
 			<Add directory="../../../IFSC/0-Softwares/CodeBlocks/allegro-5.0.10-mingw-4.7.0/include" />
 		</Compiler>
+		<Unit filename="functions.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

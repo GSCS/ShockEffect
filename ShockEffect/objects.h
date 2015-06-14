@@ -32,7 +32,6 @@ struct Enemy_red {
     int boundx;
     int boundy;
     bool moving;
-    bool jumping;
     bool alive;
 };
 
@@ -45,7 +44,6 @@ struct Enemy_blue {
     int boundx;
     int boundy;
     bool moving;
-    bool jumping;
     bool alive;
 };
 

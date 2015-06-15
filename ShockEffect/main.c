@@ -17,11 +17,11 @@
 #include <allegro5/allegro_ttf.h>
 #include "objects.h" //arquivo de objetos
 #include "functions.h"
+
 //main
 int main()
 {
     //primitive variables
-    const int FPS = 60;
     bool done = false;
     bool redraw = true;
 
@@ -32,11 +32,13 @@ int main()
     struct Shoot shootQ;
     struct Shoot shootW;
     //struct Shoot shootE;
+    struct Obstacle obstacle;
 
     //allegro variables
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
     ALLEGRO_TIMER *timer = NULL;
+    //ALLEGRO_TIMER *slowmo = NULL;
     ALLEGRO_FONT *title_font = NULL;
     ALLEGRO_FONT *medium_font = NULL;
 
@@ -79,6 +81,7 @@ int main()
     InitShootQ(shootQ);
     InitShootW(shootW);
     //InitShootE(&shootE);
+    InitObstacle(obstacle);
 
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
@@ -99,11 +102,6 @@ int main()
         else if(ev.type == ALLEGRO_EVENT_TIMER)
         {
             redraw = true;
-            if(keys[UP] && player.jump)
-            {
-                player.vely = -player.jumpSpeed;
-                player.jump = false;
-            }
             if(keys[RIGHT] && !player.moving)
             {
                 player.velx = player.speed;
@@ -114,24 +112,29 @@ int main()
                 player.velx = player.speed;
                 player.moving = true;
             }
+            ResetPlayer(player, enemyred);
             i=Change(i, player);
             al_clear_to_color(al_map_rgb(i*2,i*2,i*2));
             al_draw_text(title_font, al_map_rgb(i,0,0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
             PlayerJump(player);
-            UpdateShootQ(shootQ);
-            UpdateShootW(shootW);
+            //SlowMo(FPS);
+            TransportPlayer(player);
+            UpdateShootQ(shootQ, player);
+            UpdateShootW(shootW, player);
             //UpdateShootE(&shootE);
             ShootQColisionEnemyRed(shootQ,enemyred, size_enemy_red, player);
             ShootWColisionEnemyBlue(shootW, enemyblue, size_enemy_blue, player);
             PlayerColisionEnemyBlue(player, enemyblue, size_enemy_blue);
             PlayerColisionEnemyRed(player, enemyred, size_enemy_red);
+            PlayerColisionObstacle(player,obstacle);
             UpdateEnemyRed(enemyred, size_enemy_red, player);
             UpdateEnemyBlue(enemyblue, size_enemy_blue, player);
+            al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 100, ALLEGRO_ALIGN_LEFT, "Vely: %d", player.vely);
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 20, ALLEGRO_ALIGN_LEFT, "Score: %d", player.score);
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), WIDTH - 50, 20, ALLEGRO_ALIGN_RIGHT, "Lives: %d", player.lives);
-
-
-            ResetPlayer(player, enemyred);
+            DrawObject(obstacle);
+            UpdateObject(obstacle,medium_font,player);
+            //SlowMo(slowmo,timer,event_queue);
         }
 
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
@@ -162,6 +165,9 @@ int main()
                     	keys[E] = true;
                         FireShootE(&shootE);
                     	break;*/
+            case ALLEGRO_KEY_R:
+                keys[R] = true;
+                break;
 
             }
         }
@@ -172,7 +178,6 @@ int main()
             {
             case ALLEGRO_KEY_UP:
                 keys[UP] = false;
-                //player.vely = 0;
                 break;
             case ALLEGRO_KEY_RIGHT:
                 keys[RIGHT] = false;
@@ -190,6 +195,9 @@ int main()
                 break;
             case ALLEGRO_KEY_E:
                 keys[E] = false;
+                break;
+            case ALLEGRO_KEY_R:
+                keys[R] = false;
                 break;
             }
         }
@@ -216,7 +224,7 @@ int main()
             DrawEnemyBlue(enemyblue, size_enemy_blue, player);
             al_flip_display();
             if(i==0)
-            al_clear_to_color(al_map_rgb(0,0,0));
+                al_clear_to_color(al_map_rgb(0,0,0));
         }
     }
 

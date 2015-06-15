@@ -16,33 +16,37 @@ struct Player {
     bool moving;
     bool colision;
     bool alive;
+    bool inverted;
     int velx;
     int vely;
     int boundx; //(?) descobrir ainda
     int boundy; //(?) descobrir ainda
     int score;
+    int death_counter;
 };
 
 struct Enemy_red {
-    int x;
-    int y;
+    float x;
+    float y;
     float speed;
     int velx;
     int vely;
     int boundx;
     int boundy;
+    int real_size_enemy_red;
     bool moving;
     bool alive;
 };
 
 struct Enemy_blue {
-    int x;
-    int y;
+    float x;
+    float y;
     float speed;
     int velx;
     int vely;
     int boundx;
     int boundy;
+    int real_size_enemy_blue;
     bool moving;
     bool alive;
 };
@@ -53,6 +57,18 @@ struct Shoot {
     int y;
     int speed;
     bool live;
+};
+
+struct Obstacle{
+    char ID;
+    float x;
+    float y;
+    float speed;
+    float vely;
+    int size_obst;
+    int real_size_obst;
+    int score;
+    bool alive;
 };
 
 #endif

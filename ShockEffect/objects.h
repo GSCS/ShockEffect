@@ -29,6 +29,7 @@ struct Enemy_red {
     float x;
     float y;
     float speed;
+    float size_enemy_red;
     int velx;
     int vely;
     int boundx;
@@ -64,6 +65,7 @@ struct Obstacle{
     float x;
     float y;
     float speed;
+    float velx;
     float vely;
     int size_obst;
     int real_size_obst;

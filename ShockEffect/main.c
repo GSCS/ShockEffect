@@ -1,11 +1,11 @@
 /*********************************
 *Programação em linguagem C
 *Clarice Ribeiro e Gustavo Simas
-*V0.6.13
+*V1.6.16
 *Titulo: "NÃO DEFINIDO"
 *********************************/
 
-//inclus�o de bibliotecas
+//inclusao de bibliotecas
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,7 +27,7 @@ int main()
 
     //object variables
     struct Player player;
-    struct Enemy_red enemyred;
+    struct Enemy_red enemyred[NUM_ENEMYRED];
     struct Enemy_blue enemyblue;
     struct Shoot shootQ;
     struct Shoot shootW;
@@ -76,7 +76,7 @@ int main()
 
     //Game Init
     InitPlayer(player); //chamar fun��o que "inicia" player
-    InitEnemyRed(enemyred); //chamar fun��o que inicia enemyred
+    InitEnemyRed(enemyred, NUM_ENEMYRED); //chamar fun��o que inicia enemyred
     InitEnemyBlue(enemyblue); //chamar fun��o que inicia enemyblue
     InitShootQ(shootQ);
     InitShootW(shootW);
@@ -112,7 +112,7 @@ int main()
                 player.velx = player.speed;
                 player.moving = true;
             }
-            ResetPlayer(player, enemyred);
+            //InitEnemyRedPlus(player, enemyred, NUM_ENEMYRED);
             i=Change(i, player);
             al_clear_to_color(al_map_rgb(i*2,i*2,i*2));
             al_draw_text(title_font, al_map_rgb(i,0,0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
@@ -122,19 +122,21 @@ int main()
             UpdateShootQ(shootQ, player);
             UpdateShootW(shootW, player);
             //UpdateShootE(&shootE);
-            ShootQColisionEnemyRed(shootQ,enemyred, size_enemy_red, player);
+            ShootQColisionEnemyRed(shootQ,enemyred, NUM_ENEMYRED, player);
             ShootWColisionEnemyBlue(shootW, enemyblue, size_enemy_blue, player);
             PlayerColisionEnemyBlue(player, enemyblue, size_enemy_blue);
-            PlayerColisionEnemyRed(player, enemyred, size_enemy_red);
+            PlayerColisionEnemyRed(player, enemyred, NUM_ENEMYRED);
             PlayerColisionObstacle(player,obstacle);
-            UpdateEnemyRed(enemyred, size_enemy_red, player);
+            UpdateEnemyRed(enemyred, NUM_ENEMYRED, player);
             UpdateEnemyBlue(enemyblue, size_enemy_blue, player);
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 100, ALLEGRO_ALIGN_LEFT, "Vely: %d", player.vely);
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 20, ALLEGRO_ALIGN_LEFT, "Score: %d", player.score);
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), WIDTH - 50, 20, ALLEGRO_ALIGN_RIGHT, "Lives: %d", player.lives);
-            DrawObject(obstacle);
+            DrawObstacle(obstacle);
             UpdateObject(obstacle,medium_font,player);
             //SlowMo(slowmo,timer,event_queue);
+
+            ResetPlayer(player, enemyred, NUM_ENEMYRED, enemyblue, obstacle);
         }
 
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
@@ -220,7 +222,7 @@ int main()
             DrawShootQ(shootQ);
             DrawShootW(shootW);
             //DrawShootE(&shootE);
-            DrawEnemyRed(enemyred, size_enemy_red, player);
+            DrawEnemyRed(enemyred, NUM_ENEMYRED, player);
             DrawEnemyBlue(enemyblue, size_enemy_blue, player);
             al_flip_display();
             if(i==0)

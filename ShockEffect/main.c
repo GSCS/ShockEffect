@@ -28,7 +28,8 @@ int main()
     //object variables
     struct Player player;
     struct Enemy_red enemyred[NUM_ENEMYRED];
-    struct Enemy_blue enemyblue;
+    struct Enemy_blue enemyblue[NUM_ENEMYBLUE];
+    struct Boss boss[NUM_BOSS];
     struct Shoot shootQ;
     struct Shoot shootW;
     //struct Shoot shootE;
@@ -65,8 +66,8 @@ int main()
 
     event_queue = al_create_event_queue();
     timer = al_create_timer(1.0 / FPS);
-    medium_font = al_load_font("EHSMB.ttf", 50, 0);
-    title_font = al_load_font("French Electric Techno.ttf", 200, 0);
+    medium_font = al_load_font("fonts/EHSMB.ttf", 50, 0);
+    title_font = al_load_font("fonts/French Electric Techno.ttf", 200, 0);
     if (!title_font)
     {
         al_destroy_display(display);
@@ -76,12 +77,13 @@ int main()
 
     //Game Init
     InitPlayer(player); //chamar fun��o que "inicia" player
-    InitEnemyRed(enemyred, NUM_ENEMYRED); //chamar fun��o que inicia enemyred
+    InitEnemyRed(enemyred); //chamar fun��o que inicia enemyred
     InitEnemyBlue(enemyblue); //chamar fun��o que inicia enemyblue
     InitShootQ(shootQ);
     InitShootW(shootW);
     //InitShootE(&shootE);
     InitObstacle(obstacle);
+    InitBoss(boss);
 
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
@@ -112,31 +114,28 @@ int main()
                 player.velx = player.speed;
                 player.moving = true;
             }
-            //InitEnemyRedPlus(player, enemyred, NUM_ENEMYRED);
             i=Change(i, player);
-            al_clear_to_color(al_map_rgb(i*2,i*2,i*2));
-            al_draw_text(title_font, al_map_rgb(i,0,0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
+            DrawText(title_font, medium_font, player, boss);
             PlayerJump(player);
             //SlowMo(FPS);
             TransportPlayer(player);
             UpdateShootQ(shootQ, player);
             UpdateShootW(shootW, player);
             //UpdateShootE(&shootE);
-            ShootQColisionEnemyRed(shootQ,enemyred, NUM_ENEMYRED, player);
-            ShootWColisionEnemyBlue(shootW, enemyblue, size_enemy_blue, player);
-            PlayerColisionEnemyBlue(player, enemyblue, size_enemy_blue);
-            PlayerColisionEnemyRed(player, enemyred, NUM_ENEMYRED);
+            ShootQColisionEnemyRed(shootQ,enemyred, player);
+            ShootWColisionEnemyBlue(shootW, enemyblue, player);
+            ShootColisionBoss(shootW, shootQ, boss, player);
+            PlayerColisionEnemyBlue(player, enemyblue);
+            PlayerColisionEnemyRed(player, enemyred);
             PlayerColisionObstacle(player,obstacle);
-            UpdateEnemyRed(enemyred, NUM_ENEMYRED, player);
-            UpdateEnemyBlue(enemyblue, size_enemy_blue, player);
-            al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 100, ALLEGRO_ALIGN_LEFT, "Vely: %d", player.vely);
-            al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 20, ALLEGRO_ALIGN_LEFT, "Score: %d", player.score);
-            al_draw_textf(medium_font, al_map_rgb(255, 255, 255), WIDTH - 50, 20, ALLEGRO_ALIGN_RIGHT, "Lives: %d", player.lives);
+            PlayerColisionBoss(player, boss);
+            UpdateEnemyRed(enemyred, player);
+            UpdateEnemyBlue(enemyblue, player);
             DrawObstacle(obstacle);
             UpdateObject(obstacle,medium_font,player);
-            //SlowMo(slowmo,timer,event_queue);
+            UpdateBoss(boss, player, enemyred, enemyblue);
 
-            ResetPlayer(player, enemyred, NUM_ENEMYRED, enemyblue, obstacle);
+            ResetPlayer(player, enemyred, enemyblue, obstacle, boss);
         }
 
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
@@ -222,8 +221,10 @@ int main()
             DrawShootQ(shootQ);
             DrawShootW(shootW);
             //DrawShootE(&shootE);
-            DrawEnemyRed(enemyred, NUM_ENEMYRED, player);
-            DrawEnemyBlue(enemyblue, size_enemy_blue, player);
+            DrawEnemyRed(enemyred, player);
+            DrawEnemyBlue(enemyblue, player);
+            DrawBoss(boss, player);
+
             al_flip_display();
             if(i==0)
                 al_clear_to_color(al_map_rgb(0,0,0));

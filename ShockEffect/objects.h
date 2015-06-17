@@ -43,6 +43,7 @@ struct Enemy_blue {
     float x;
     float y;
     float speed;
+    float size_enemy_blue;
     int velx;
     int vely;
     int boundx;
@@ -50,6 +51,23 @@ struct Enemy_blue {
     int real_size_enemy_blue;
     bool moving;
     bool alive;
+};
+
+struct Boss {
+    float x;
+    float real_x;
+    float y;
+    float real_y;
+    float speed;
+    float size_boss;
+    int velx;
+    int vely;
+    int boundx;
+    int boundy;
+    int real_size_boss;
+    int lives;
+    bool alive;
+    bool lived;
 };
 
 struct Shoot {

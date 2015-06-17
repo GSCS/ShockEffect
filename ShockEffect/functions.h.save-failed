@@ -799,7 +799,7 @@ void UpdateBoss(struct Boss boss[], struct Player &player, struct Enemy_red enem
     {
         boss[0].alive = true;
         NUM_BOSS = 1;
-    }
+    }281373
     int k;
     int j;
     for(j=0; j<NUM_BOSS; j++)

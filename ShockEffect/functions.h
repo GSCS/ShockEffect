@@ -862,6 +862,7 @@ void PlayerColisionBoss(struct Player &player, struct Boss boss[])
                     (boss[j].y + boss[j].size_boss) > player.y - player.boundy &&
                     (boss[j].y - boss[j].size_boss) < player.y)
             {
+                player.lives--;
                 boss[j].lives--;
                 boss[j].real_y = HEIGHT/2;
                 boss[j].x = 150 + (rand() % 900);
@@ -905,8 +906,6 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
         }
     }
 }
-
-
 
 /*void SlowMo(ALLEGRO_TIMER *slowmo, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *event_queue)
 {

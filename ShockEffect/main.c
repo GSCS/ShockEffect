@@ -1,8 +1,8 @@
 /*********************************
 *Programação em linguagem C
 *Clarice Ribeiro e Gustavo Simas
-*V1.6.16
-*Titulo: "NÃO DEFINIDO"
+*V1.6.18
+*Titulo: "SHOCK EFFECT"
 *********************************/
 
 //inclusao de bibliotecas

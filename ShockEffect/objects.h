@@ -2,10 +2,11 @@
 #define __objects_h
 
 //obj IDS (para indentificar o objeto)
-enum IDS{PLAYER, ENEMY, BULLET};
+enum IDS{PLAYER, ENEMY, SHOOT};
 
 //estrutura do player
-struct Player {
+struct Player
+{
     char ID;
     int x; //posição x
     int y; //posição y
@@ -17,6 +18,7 @@ struct Player {
     bool colision;
     bool alive;
     bool inverted;
+    bool shield;
     int velx;
     int vely;
     int boundx; //(?) descobrir ainda
@@ -25,35 +27,41 @@ struct Player {
     int death_counter;
 };
 
-struct Enemy_red {
+struct Enemy_red
+{
+    char ID;
     float x;
     float y;
     float speed;
-    float size_enemy_red;
-    int velx;
+    float size_enemy;
+    float velx;
     int vely;
     int boundx;
     int boundy;
-    int real_size_enemy_red;
+    int real_size_enemy;
     bool moving;
     bool alive;
 };
 
-struct Enemy_blue {
+struct Enemy_blue
+{
+    char ID;
     float x;
     float y;
     float speed;
-    float size_enemy_blue;
+    float size_enemy;
     int velx;
     int vely;
     int boundx;
     int boundy;
-    int real_size_enemy_blue;
+    int real_size_enemy;
     bool moving;
     bool alive;
 };
 
-struct Boss {
+struct Boss
+{
+    char ID;
     float x;
     float real_x;
     float y;
@@ -70,15 +78,19 @@ struct Boss {
     bool lived;
 };
 
-struct Shoot {
+struct Shoot
+{
     char ID;
     int x;
     int y;
     int speed;
+    int temp;
+    int s;
     bool live;
 };
 
-struct Obstacle{
+struct Obstacle
+{
     char ID;
     float x;
     float y;

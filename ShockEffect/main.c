@@ -14,6 +14,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/bitmap.h>
+#include <allegro5/allegro_image.h>
 #include "objects.h" //header de objetos
 #include "functions.h" //header de funcoes
 
@@ -49,6 +50,7 @@ int main()
     struct Shoot shootW;
     struct Shoot shootE;
     struct Obstacle obstacle;
+    struct Background background;
 
     //allegro variables
     ALLEGRO_DISPLAY *display;
@@ -74,6 +76,12 @@ int main()
     al_init_primitives_addon();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_init_image_addon();
+    if(!al_init_image_addon())
+    {
+        printf("Falha ao inicializar image addon");
+        return -1;
+    }
     al_install_keyboard();
     if (!al_init_ttf_addon())
     {
@@ -92,6 +100,9 @@ int main()
         return -1;
     }
 
+
+    int b;
+
     //Inicializacao de objetos
     InitPlayer(player, &text_color); //funcao que "inicia" player
     InitEnemyRed(enemyred, &NUM_ENEMYRED); //funcao que inicia enemyred
@@ -101,6 +112,7 @@ int main()
     InitShootE(shootE); //funcao que inicializa habilidade de escudo (shield / resistor)
     InitObstacle(obstacle); //funcao que inicializa obstaculos
     InitBoss(boss, &NUM_BOSS); //funcao que inicializa chefes (bosses)
+    InitBackground(background);
 
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
@@ -137,7 +149,6 @@ int main()
             PlayerJump(player, &keys[UP]);
             PlayerRight(player, &keys[RIGHT]);
             PlayerLeft(player, &keys[LEFT]);
-            //SlowMo(FPS);
             TransportPlayer(player);
             UpdateShootQ(shootQ, player);
             UpdateShootW(shootW, player);
@@ -234,9 +245,18 @@ int main()
             DrawObstacle(obstacle);
             DrawPlayer(player);
 
+            if(++background.frame_count >= background.frame_delay)
+            {
+                if(++background.frame_atual >= background.frame_max)
+                    background.frame_atual = 0;
+                background.frame_count = 0;
+            }
+
+            al_draw_bitmap(background.image[background.frame_atual], 0, 0, 0);
             al_flip_display();
             if(text_color == 0)
                 al_clear_to_color(al_map_rgb(0,0,0));
+
         }
     }
 
@@ -245,6 +265,11 @@ int main()
     al_destroy_font(title_font);
     al_destroy_font(medium_font);
     al_destroy_display(display);
+    for(b=0; b<background.frame_max; b++)
+    {
+        al_destroy_bitmap(background.image[b]);
+    }
+
 
     return 0;
 }//final da MAIN!!

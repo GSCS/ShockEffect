@@ -59,4 +59,6 @@ void PlayerColisionObstacle(Player &player, Obstacle &obstacle);
 void ChangeColor(int *text_color, struct Player &player, struct Boss boss[], int *num_boss, int *text_boss);
 void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &player, Boss boss[], int *num_boss, int *text_color, int *text_boss);
 
+void InitBackground(struct Background &background);
+
 #endif // FUNCTIONS_H_INCLUDED

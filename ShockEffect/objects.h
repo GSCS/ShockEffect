@@ -103,4 +103,16 @@ struct Obstacle
     bool alive;
 };
 
+struct Background
+{
+    int x;
+    int y;
+    int frame_max;
+    int frame_atual;
+    int frame_count;
+    int frame_delay;
+
+    struct ALLEGRO_BITMAP *image[];
+};
+
 #endif

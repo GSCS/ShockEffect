@@ -967,6 +967,25 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
     }
 }
 
+void InitBackground(struct Background &background)
+{
+    background.frame_atual = 0;
+    background.frame_count = 0;
+    background.frame_delay = 6;
+    background.frame_max = 10;
+
+    background.image[0] = al_load_bitmap("images/background/back_0");
+    background.image[1] = al_load_bitmap("images/background/back_1");
+    background.image[2] = al_load_bitmap("images/background/back_2");
+    background.image[3] = al_load_bitmap("images/background/back_3");
+    background.image[4] = al_load_bitmap("images/background/back_4");
+    background.image[5] = al_load_bitmap("images/background/back_5");
+    background.image[6] = al_load_bitmap("images/background/back_6");
+    background.image[7] = al_load_bitmap("images/background/back_7");
+    background.image[8] = al_load_bitmap("images/background/back_8");
+    background.image[9] = al_load_bitmap("images/background/back_9");
+}
+
 //funcao para slow motion
 /*void SlowMo(ALLEGRO_TIMER *slowmo, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *event_queue)
 {

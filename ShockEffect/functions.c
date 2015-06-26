@@ -15,6 +15,8 @@
 extern const int WIDTH = 1200; //largura display
 extern const int HEIGHT = 600; //altura display
 extern const int GRAVITY = 1; //gravidade padrao em 1
+extern const int back_x = 930;
+extern const int back_y = 300;
 
 //funcao para iniciar jogador
 void InitPlayer(Player &player, int *text_color)
@@ -225,7 +227,7 @@ void DrawShootQ(struct Shoot &shootQ)
 {
     if(shootQ.live)
     {
-        al_draw_line(((shootQ.x)), (shootQ.y), ((shootQ.x)), ((shootQ.y) - 25), al_map_rgb(0, 0, 255), 5);
+        al_draw_filled_circle(shootQ.x, shootQ.y, 10, al_map_rgb(0, 0, 255));
     }
 }
 
@@ -291,7 +293,7 @@ void DrawShootW(struct Shoot &shootW)
 {
     if (shootW.live)
     {
-        al_draw_line(((shootW.x)), (shootW.y), ((shootW.x)), ((shootW.y) + 25), al_map_rgb(0, 255, 0), 5);
+        al_draw_filled_circle(shootW.x, shootW.y, 15, al_map_rgb(255, 0, 0));
     }
 }
 
@@ -399,15 +401,16 @@ void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies)
     for(j=0; j < *num_enemies; j++)
     {
         enemyred[j].ID = ENEMY;
-        enemyred[j].x = 350 + (rand() % 500);
-        enemyred[j].y = 150;
-        enemyred[j].speed = 0.005;
+        enemyred[j].x = back_x;
+        enemyred[j].y = back_y - (rand() % 50);
+        enemyred[j].speed = 0.001;
+        enemyred[j].speedx = 0.005;
         enemyred[j].size_enemy = 0;
         enemyred[j].velx = 0;
         enemyred[j].vely = 0;
         enemyred[j].boundx = 0;
         enemyred[j].boundy = 0;
-        enemyred[j].real_size_enemy = 80;
+        enemyred[j].real_size_enemy = 30;
         enemyred[j].moving = false;
         enemyred[j].alive = true;
     }
@@ -424,23 +427,20 @@ void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &
             al_draw_filled_circle(enemyred[j].x, enemyred[j].y, enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy + 150, 0, 0));
             al_draw_filled_rectangle(enemyred[j].x + 20, enemyred[j].y - 10, enemyred[j].x + enemyred[j].size_enemy, enemyred[j].y - enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy+100, enemyred[j].size_enemy, 0));
             al_draw_filled_rectangle(enemyred[j].x - 20, enemyred[j].y, enemyred[j].x - enemyred[j].size_enemy, enemyred[j].y + enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy+100, enemyred[j].size_enemy, 0));
-
         }
         else if(enemyred[j].alive == false)
         {
-            enemyred[j].x= 350 + (rand() % 500);
-            if(player.inverted == false)
-                enemyred[j].y = 150;
-            if(player.inverted)
-                enemyred[j].y = 400;
-            enemyred[j].size_enemy=0;
+            enemyred[j].x= back_x;
+            enemyred[j].y = back_y - (rand() % 50);
+            enemyred[j].size_enemy = 0;
             enemyred[j].velx = 0;
+            enemyred[j].vely = 0;
         }
     }
 }
 
 //funcao para atualizar inimigo vermelho
-void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player)
+void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player, struct Shoot &shootQ)
 {
     *num_enemies = 1;
     if(player.score > 10)
@@ -450,6 +450,10 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
     int j;
     for(j=0; j < *num_enemies; j++)
     {
+        if(shootQ.live == false)
+        {
+            enemyred[j].alive = true;
+        }
         if(enemyred[j].x - enemyred[j].boundx > WIDTH ||
                 enemyred[j].x + enemyred[j].boundx < 0 ||
                 enemyred[j].y + enemyred[j].boundy < 0 ||
@@ -457,16 +461,18 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
             enemyred[j].alive = false;
         if(enemyred[j].alive)
         {
-            enemyred[j].size_enemy += enemyred[j].velx;
-            enemyred[j].velx += enemyred[j].speed;
-            if(!player.inverted)
-                enemyred[j].y += 1.5;
-            if(player.inverted)
-                enemyred[j].y -= 1.5;
-            if(enemyred[j].x > player.x)
+            enemyred[j].velx += enemyred[j].speedx;
+            if(enemyred[j].size_enemy < enemyred[j].real_size_enemy*0.8)
                 enemyred[j].x -= enemyred[j].velx;
-            if(enemyred[j].x < player.x)
-                enemyred[j].x += enemyred[j].velx;
+            enemyred[j].vely += enemyred[j].speed;
+            enemyred[j].size_enemy += enemyred[j].vely;
+            if(enemyred[j].size_enemy > enemyred[j].real_size_enemy*0.8)
+            {
+                if(enemyred[j].x < player.x)
+                    enemyred[j].x += enemyred[j].velx;
+                if(enemyred[j].x > player.x)
+                    enemyred[j].x -= enemyred[j].velx;
+            }
         }
     }
 }
@@ -501,8 +507,8 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
         if(enemyblue[j].alive && player.score >= 6)
         {
             al_draw_filled_circle(enemyblue[j].x, enemyblue[j].y, enemyblue[j].size_enemy, al_map_rgb(0, enemyblue[j].size_enemy * 6, enemyblue[j].size_enemy * 6));
-            //al_draw_filled_rectangle(enemyblue[j].x + 10, enemyblue[j].y - 5, enemyblue[j].x + enemyblue[j].size_enemy, enemyblue[j].y - enemyblue[j].size_enemy, al_map_rgb(150, enemyblue[j].size_enemy, enemyblue[j].size_enemy + 100));
-            //al_draw_filled_rectangle(enemyblue[j].x - 10, enemyblue[j].y - 5, enemyblue[j].x - enemyblue[j].size_enemy, enemyblue[j].y + enemyblue[j].size_enemy, al_map_rgb(enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy));
+            al_draw_filled_rectangle(enemyblue[j].x + 10, enemyblue[j].y - 5, enemyblue[j].x + enemyblue[j].size_enemy, enemyblue[j].y - enemyblue[j].size_enemy, al_map_rgb(150, enemyblue[j].size_enemy, enemyblue[j].size_enemy + 100));
+            al_draw_filled_rectangle(enemyblue[j].x - 10, enemyblue[j].y - 5, enemyblue[j].x - enemyblue[j].size_enemy, enemyblue[j].y + enemyblue[j].size_enemy, al_map_rgb(enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy));
         }
         else if(enemyblue[j].alive == false)
         {
@@ -517,7 +523,7 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
 }
 
 //funcao para atualizar inimigo azul
-void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player)
+void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player, struct Shoot &shootW)
 {
     *num_enemies = 1;
     if(player.score > 10)
@@ -525,6 +531,10 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
     int j;
     for(j=0; j < *num_enemies; j++)
     {
+        if(shootW.live == false)
+        {
+            enemyblue[j].alive = true;
+        }
         if(enemyblue[j].x + enemyblue[j].boundx > WIDTH || enemyblue[j].x - enemyblue[j].boundx < 0)
             enemyblue[j].alive = false;
         if(enemyblue[j].alive && player.score >= 6)
@@ -581,11 +591,8 @@ void ShootQColisionEnemyRed(struct Shoot &shootQ, struct Enemy_red enemyred[], i
             {
                 enemyred[j].alive = false;
                 player.score += 2;
+                shootQ.live = false;
             }
-        }
-        if(shootQ.live == false)
-        {
-            enemyred[j].alive = true;
         }
     }
 }
@@ -608,11 +615,8 @@ void ShootWColisionEnemyBlue(struct Shoot &shootW, struct Enemy_blue enemyblue[]
             {
                 enemyblue[j].alive = false;
                 player.score += 1;
+                shootW.live = false;
             }
-        }
-        if(shootW.live == false)
-        {
-            enemyblue[j].alive = true;
         }
     }
 }
@@ -671,8 +675,8 @@ void PlayerColisionEnemyBlue(struct Player &player, struct Enemy_blue enemyblue[
 void InitObstacle(Obstacle &obstacle)
 {
     obstacle.ID = ENEMY;
-    obstacle.x = WIDTH/2;
-    obstacle.y = HEIGHT/2;
+    obstacle.x = back_x;
+    obstacle.y = back_y;
     obstacle.speed = 0.1;
     obstacle.velx = 1;
     obstacle.vely = 0;
@@ -733,8 +737,8 @@ void UpdateObstacle(Obstacle &obstacle, ALLEGRO_FONT *medium_font, Player &playe
     }
     if(obstacle.y>HEIGHT+20 || obstacle.y < -20)
     {
-        obstacle.x = 200 + (rand() % 400);
-        obstacle.y = HEIGHT/2;
+        obstacle.x = back_x;
+        obstacle.y = back_y;
         obstacle.speed = 0.1;
         obstacle.velx = 1;
         obstacle.vely = 0;
@@ -754,8 +758,8 @@ void PlayerColisionObstacle(Player &player, Obstacle &obstacle)
         if(player.x>=obstacle.x &&
                 player.x+player.boundx <= obstacle.x+obstacle.size_obst && !player.jump)
         {
-            obstacle.x = 200 + (rand() % 400);
-            obstacle.y = HEIGHT/2;
+            obstacle.x = back_x;
+            obstacle.y = back_y;
             obstacle.speed = 0.1;
             obstacle.velx = 1;
             obstacle.vely = 0;
@@ -773,14 +777,13 @@ void PlayerColisionObstacle(Player &player, Obstacle &obstacle)
 //funcao para escrever textos
 void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &player, Boss boss[], int *num_boss, int *text_color, int *text_boss)
 {
-    al_clear_to_color(al_map_rgb(*text_color*2, *text_color*2, *text_color*2));
-    al_draw_text(title_font, al_map_rgb(*text_color, 0, 0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
+    if(*text_color > 1)
+        al_draw_text(title_font, al_map_rgb(*text_color, 0, 0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
     int j;
     for(j=0; j < *num_boss; j++)
     {
         if(boss[j].alive)
         {
-            al_clear_to_color(al_map_rgb(*text_boss * 2, *text_boss * 2, *text_boss * 2));
             al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 100, ALLEGRO_ALIGN_LEFT, "Boss: %d", boss[j].lives);
             al_draw_textf(medium_font, al_map_rgb(*text_boss, 0, 0), WIDTH/2, 100, ALLEGRO_ALIGN_CENTRE, "Boss %d", *num_boss);
         }
@@ -801,7 +804,7 @@ void ChangeColor(int *text_color, struct Player &player, struct Boss boss[], int
     {
         if(boss[j].alive && *text_boss > 1)
             *text_boss -= 1;
-        if(*text_boss == 0)
+        if(*text_boss == 1)
             *text_boss = 255;
     }
 }
@@ -838,8 +841,8 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
         if(boss[j].alive)
         {
             al_draw_filled_circle(boss[j].x, boss[j].y, boss[j].size_boss, al_map_rgb(255,0,255));
-            //al_draw_filled_rectangle(boss[j].x + 30, boss[j].y - 5, boss[j].x + boss[j].size_boss, boss[j].y - boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, boss[j].size_boss, 0));
-            //al_draw_filled_rectangle(boss[j].x - 40, boss[j].y, boss[j].x - boss[j].size_boss, boss[j].y + boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, 50, boss[j].size_boss));
+            al_draw_filled_rectangle(boss[j].x + 30, boss[j].y - 5, boss[j].x + boss[j].size_boss, boss[j].y - boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, boss[j].size_boss, 0));
+            al_draw_filled_rectangle(boss[j].x - 40, boss[j].y, boss[j].x - boss[j].size_boss, boss[j].y + boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, 50, boss[j].size_boss));
         }
     }
 }
@@ -853,7 +856,7 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
         boss[0].alive = true;
         *num_boss = 1;
     }
-    if(player.score > 80 && boss[1].lived == false)
+    if(player.score > 100 && boss[1].lived == false)
     {
         boss[1].alive = true;
         *num_boss = 2;
@@ -893,11 +896,6 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
                 boss[j].y += boss[j].vely;
             if(boss[j].y > boss[j].real_y)
                 boss[j].y -= boss[j].vely;
-
-            /*if(boss[j].x < boss[j].real_x)
-                boss[j].x += boss[j].velx;
-            if(boss[j].x > boss[j].real_x)
-                boss[j].x -= boss[j].velx;*/
 
             if(boss[j].x < player.x)
                 boss[j].x+=boss[j].velx;
@@ -971,34 +969,31 @@ void InitBackground(struct Background &background)
 {
     background.frame_atual = 0;
     background.frame_count = 0;
-    background.frame_delay = 6;
+    background.frame_delay = 3;
     background.frame_max = 10;
 
-    background.image[0] = al_load_bitmap("images/background/back_0");
-    background.image[1] = al_load_bitmap("images/background/back_1");
-    background.image[2] = al_load_bitmap("images/background/back_2");
-    background.image[3] = al_load_bitmap("images/background/back_3");
-    background.image[4] = al_load_bitmap("images/background/back_4");
-    background.image[5] = al_load_bitmap("images/background/back_5");
-    background.image[6] = al_load_bitmap("images/background/back_6");
-    background.image[7] = al_load_bitmap("images/background/back_7");
-    background.image[8] = al_load_bitmap("images/background/back_8");
-    background.image[9] = al_load_bitmap("images/background/back_9");
+    background.image[0] = al_load_bitmap("images/background/back_0.bmp");
+    background.image[1] = al_load_bitmap("images/background/back_1.bmp");
+    background.image[2] = al_load_bitmap("images/background/back_2.bmp");
+    background.image[3] = al_load_bitmap("images/background/back_3.bmp");
+    background.image[4] = al_load_bitmap("images/background/back_4.bmp");
+    background.image[5] = al_load_bitmap("images/background/back_5.bmp");
+    background.image[6] = al_load_bitmap("images/background/back_6.bmp");
+    background.image[7] = al_load_bitmap("images/background/back_7.bmp");
+    background.image[8] = al_load_bitmap("images/background/back_8.bmp");
+    background.image[9] = al_load_bitmap("images/background/back_9.bmp");
 }
 
-//funcao para slow motion
-/*void SlowMo(ALLEGRO_TIMER *slowmo, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *event_queue)
+void DrawBackground(struct Background &background)
 {
-    if(keys[R] == true)
+    if(++background.frame_count >= background.frame_delay)
     {
-        slowmo = al_create_timer(1.0 / 60);
-        al_register_event_source(event_queue, al_get_timer_event_source(slowmo));
-        al_start_timer(slowmo);
+        if(++background.frame_atual >= background.frame_max)
+            background.frame_atual = 0;
+        background.frame_count = 0;
     }
-    else if(keys[R] == false)
-    {
-        al_destroy_timer(slowmo);
-    }
-}*/
+
+    al_draw_bitmap(background.image[background.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
+}
 
 #endif // FUNCTIONS_H_INCLUDED

@@ -1,7 +1,7 @@
 /*********************************
 *Programação em linguagem C
 *Clarice Ribeiro e Gustavo Simas
-*V1.6.20
+*V1.6.24
 *Titulo: "SHOCK EFFECT"
 *********************************/
 
@@ -24,6 +24,8 @@ const int WIDTH = 1200; //largura display
 const int HEIGHT = 600; //altura display
 const int GRAVITY = 1;
 const int FPS = 60;
+const int back_x = 930; //ponto x do fundo do background
+const int back_y = 300; //ponto y do fundo do background
 enum KEYS {UP, DOWN, LEFT, RIGHT, Q, W, E, R};
 bool keys[8] = {false, false, false, false, false, false, false, false};
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,9 +59,9 @@ int main()
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
     ALLEGRO_TIMER *timer = NULL;
 
-    //ALLEGRO_TIMER *slowmo = NULL;
     ALLEGRO_FONT *title_font = NULL;
     ALLEGRO_FONT *medium_font = NULL;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +77,6 @@ int main()
     //Allegro Module Init
     al_init_primitives_addon();
     al_init_font_addon();
-    al_init_ttf_addon();
     al_init_image_addon();
     if(!al_init_image_addon())
     {
@@ -91,7 +92,7 @@ int main()
 
     event_queue = al_create_event_queue();
     timer = al_create_timer(1.0 / FPS);
-    medium_font = al_load_font("fonts/EHSMB.ttf", 50, 0);
+    medium_font = al_load_font("fonts/EHSMB.TTF", 50, 0);
     title_font = al_load_font("fonts/French Electric Techno.ttf", 200, 0);
     if (!title_font)
     {
@@ -145,7 +146,6 @@ int main()
             }
 
             ChangeColor(&text_color, player, boss, &NUM_BOSS, &text_boss);
-            DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss);
             PlayerJump(player, &keys[UP]);
             PlayerRight(player, &keys[RIGHT]);
             PlayerLeft(player, &keys[LEFT]);
@@ -153,17 +153,17 @@ int main()
             UpdateShootQ(shootQ, player);
             UpdateShootW(shootW, player);
             UpdateShootE(shootE, player);
-            ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);
-            ShootWColisionEnemyBlue(shootW, enemyblue, &NUM_ENEMYBLUE, player);
-            ShootColisionBoss(shootW, shootQ, boss, &NUM_BOSS, player);
+            UpdateEnemyRed(enemyred, &NUM_ENEMYRED, player, shootQ);
+            UpdateEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player, shootW);
+            UpdateObstacle(obstacle, medium_font, player);
+            UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE);
             PlayerColisionEnemyBlue(player, enemyblue, &NUM_ENEMYBLUE);
             PlayerColisionEnemyRed(player, enemyred, &NUM_ENEMYRED);
             PlayerColisionObstacle(player,obstacle);
             PlayerColisionBoss(player, boss, &NUM_BOSS);
-            UpdateEnemyRed(enemyred, &NUM_ENEMYRED, player);
-            UpdateEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player);
-            UpdateObstacle(obstacle, medium_font, player);
-            UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE);
+            ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);
+            ShootWColisionEnemyBlue(shootW, enemyblue, &NUM_ENEMYBLUE, player);
+            ShootColisionBoss(shootW, shootQ, boss, &NUM_BOSS, player);
 
             ResetPlayer(player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE, obstacle, boss, &NUM_BOSS, &text_color);
         }
@@ -236,6 +236,8 @@ int main()
         {
             redraw = false;
 
+            DrawBackground(background);
+            DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss);
             DrawShootQ(shootQ);
             DrawShootW(shootW);
             DrawShootE(shootE, player);
@@ -244,19 +246,10 @@ int main()
             DrawBoss(boss, &NUM_BOSS, player);
             DrawObstacle(obstacle);
             DrawPlayer(player);
+            al_draw_filled_circle(930, 300, 10, al_map_rgb(255, 255, 255));
 
-            if(++background.frame_count >= background.frame_delay)
-            {
-                if(++background.frame_atual >= background.frame_max)
-                    background.frame_atual = 0;
-                background.frame_count = 0;
-            }
 
-            al_draw_bitmap(background.image[background.frame_atual], 0, 0, 0);
             al_flip_display();
-            if(text_color == 0)
-                al_clear_to_color(al_map_rgb(0,0,0));
-
         }
     }
 
@@ -270,6 +263,5 @@ int main()
         al_destroy_bitmap(background.image[b]);
     }
 
-
     return 0;
-}//final da MAIN!!
+}

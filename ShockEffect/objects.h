@@ -35,7 +35,8 @@ struct Enemy_red
     float speed;
     float size_enemy;
     float velx;
-    int vely;
+    float speedx;
+    float vely;
     int boundx;
     int boundy;
     int real_size_enemy;
@@ -112,7 +113,7 @@ struct Background
     int frame_count;
     int frame_delay;
 
-    struct ALLEGRO_BITMAP *image[];
+    ALLEGRO_BITMAP *image[10];
 };
 
 #endif

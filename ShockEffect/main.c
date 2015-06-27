@@ -61,6 +61,7 @@ int main()
     struct Sprite background3;
     struct Sprite background4;
     struct Sprite background5;
+    struct Sprite background6;
     struct Sprite enemyred_sprite;
 
     //allegro variables
@@ -128,6 +129,7 @@ int main()
     InitBackground3(background3, letra); //funcao que inicializa sprite de background3 alternativo
     InitBackground4(background4, letra); //funcao que inicializa sprite de background4 alternativo
     InitBackground5(background5, letra); //funcao que inicializa sprite de background4 alternativo
+    InitBackground6(background6, letra); //funcao que inicializa sprite de background4 alternativo
     InitEnemyredSprite(enemyred_sprite); // funcao que inicializa sprite de inimigo vermelho
 
 
@@ -258,6 +260,7 @@ int main()
             DrawBackground3(background3, letra);
             DrawBackground4(background4, letra);
             DrawBackground5(background5, letra);
+            DrawBackground6(background6, letra);
             DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss);
             DrawShootQ(shootQ);
             DrawShootW(shootW);
@@ -302,6 +305,10 @@ int main()
     for(b=0; b<background5.frame_max; b++)
     {
         al_destroy_bitmap(background5.image[b]);
+    }
+     for(b=0; b<background6.frame_max; b++)
+    {
+        al_destroy_bitmap(background6.image[b]);
     }
 
     return 0;

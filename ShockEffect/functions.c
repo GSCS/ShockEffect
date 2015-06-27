@@ -1211,6 +1211,55 @@ void DrawBackground5(struct Sprite &background5, int letra)
     }
 }
 
+void InitBackground6(struct Sprite &background6, int letra)
+{
+    if(letra == 7)
+    {
+        background6.frame_atual = 0;
+        background6.frame_count = 0;
+        background6.frame_delay = 5;
+        background6.frame_max = 21;
+
+        background6.image[0] = al_load_bitmap("images/background/back9/back9 (1).png");
+        background6.image[1] = al_load_bitmap("images/background/back9/back9 (5).png");
+        background6.image[2] = al_load_bitmap("images/background/back9/back9 (10).png");
+        background6.image[3] = al_load_bitmap("images/background/back9/back9 (15).png");
+        background6.image[4] = al_load_bitmap("images/background/back9/back9 (20).png");
+        background6.image[5] = al_load_bitmap("images/background/back9/back9 (25).png");
+        background6.image[6] = al_load_bitmap("images/background/back9/back9 (30).png");
+        background6.image[7] = al_load_bitmap("images/background/back9/back9 (35).png");
+        background6.image[8] = al_load_bitmap("images/background/back9/back9 (40).png");
+        background6.image[9] = al_load_bitmap("images/background/back9/back9 (45).png");
+        background6.image[10] = al_load_bitmap("images/background/back9/back9 (50).png");
+        background6.image[11] = al_load_bitmap("images/background/back9/back9 (55).png");
+        background6.image[12] = al_load_bitmap("images/background/back9/back9 (60).png");
+        background6.image[13] = al_load_bitmap("images/background/back9/back9 (65).png");
+        background6.image[14] = al_load_bitmap("images/background/back9/back9 (70).png");
+        background6.image[15] = al_load_bitmap("images/background/back9/back9 (75).png");
+        background6.image[16] = al_load_bitmap("images/background/back9/back9 (80).png");
+        background6.image[17] = al_load_bitmap("images/background/back9/back9 (85).png");
+        background6.image[18] = al_load_bitmap("images/background/back9/back9 (90).png");
+        background6.image[19] = al_load_bitmap("images/background/back9/back9 (95).png");
+        background6.image[20] = al_load_bitmap("images/background/back9/back9 (99).png");
+    }
+}
+
+void DrawBackground6(struct Sprite &background6, int letra)
+{
+    if(letra == 7)
+    {
+        if(++background6.frame_count >= background6.frame_delay)
+        {
+            if(++background6.frame_atual >= background6.frame_max)
+                background6.frame_atual = 0;
+            background6.frame_count = 0;
+        }
+
+        al_draw_bitmap(background6.image[background6.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
+    }
+}
+
+
 void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 {
     enemyred_sprite.frame_atual = 0;
@@ -1223,7 +1272,7 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza\n 4 - LSD World\n 5 - Luz, luz!\n 6 - Preto no Branco\n");
+    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza\n 4 - LSD World\n 5 - Luz, luz!\n 6 - Preto no Branco\n 7 - Tudo azul...\n");
     scanf("%d", &letra);
     if(letra == 1)
     {
@@ -1267,12 +1316,20 @@ void OpcaoBackground(int &letra)
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
     }
+    if(letra == 7)
+    {
+        WIDTH = 400;
+        HEIGHT = 400;
+        back_x = WIDTH/2;
+        back_y = HEIGHT/2;
+    }
     else if(letra != 1 &&
             letra != 2 &&
             letra != 3 &&
             letra != 4 &&
             letra != 5 &&
-            letra != 6)
+            letra != 6 &&
+            letra != 7)
         printf("Incorreto!");
 }
 

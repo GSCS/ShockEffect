@@ -72,6 +72,8 @@ void InitBackground4(struct Sprite &background4, int letra);
 void DrawBackground4(struct Sprite &background4, int letra);
 void InitBackground5(struct Sprite &background5, int letra);
 void DrawBackground5(struct Sprite &background5, int letra);
+void InitBackground6(struct Sprite &background6, int letra);
+void DrawBackground6(struct Sprite &background6, int letra);
 void InitEnemyredSprite(struct Sprite &enemyred_sprite);
 
 void OpcaoBackground(int &letra);

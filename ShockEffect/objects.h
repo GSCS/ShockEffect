@@ -50,12 +50,13 @@ struct Enemy_blue
     float x;
     float y;
     float speed;
+    float speedx;
     float size_enemy;
-    int velx;
-    int vely;
+    float velx;
+    float vely;
     int boundx;
     int boundy;
-    int real_size_enemy;
+    float real_size_enemy;
     bool moving;
     bool alive;
 };
@@ -104,7 +105,7 @@ struct Obstacle
     bool alive;
 };
 
-struct Background
+struct Sprite
 {
     int x;
     int y;
@@ -113,7 +114,8 @@ struct Background
     int frame_count;
     int frame_delay;
 
-    ALLEGRO_BITMAP *image[10];
+    ALLEGRO_BITMAP *image[20];
 };
+
 
 #endif

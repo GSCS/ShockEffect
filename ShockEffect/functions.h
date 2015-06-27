@@ -30,7 +30,7 @@ void UpdateShootE(Shoot &shootE, Player &player);
 
 //Funções enemyred
 void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies);
-void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player);
+void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player, struct Sprite &enemyred_sprite);
 void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player, struct Shoot &shootQ);
 void ShootQColisionEnemyRed(struct Shoot &shootQ, struct Enemy_red enemyred[], int *num_enemies, struct Player &player);
 void PlayerColisionEnemyRed(struct Player &player, struct Enemy_red enemyred[], int *num_enemies);
@@ -60,7 +60,20 @@ void ChangeColor(int *text_color, struct Player &player, struct Boss boss[], int
 void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &player, Boss boss[], int *num_boss, int *text_color, int *text_boss);
 
 //funcoes para background
-void InitBackground(struct Background &background);
-void DrawBackground(struct Background &background);
+void InitBackground(struct Sprite &background, int letra);
+void DrawBackground(struct Sprite &background, int letra);
+void InitBackground1(struct Sprite &background1, int letra);
+void DrawBackground1(struct Sprite &background1, int letra);
+void InitBackground2(struct Sprite &background2, int letra);
+void DrawBackground2(struct Sprite &background2, int letra);
+void InitBackground3(struct Sprite &background3, int letra);
+void DrawBackground3(struct Sprite &background3, int letra);
+void InitBackground4(struct Sprite &background4, int letra);
+void DrawBackground4(struct Sprite &background4, int letra);
+void InitBackground5(struct Sprite &background5, int letra);
+void DrawBackground5(struct Sprite &background5, int letra);
+void InitEnemyredSprite(struct Sprite &enemyred_sprite);
+
+void OpcaoBackground(int &letra);
 
 #endif // FUNCTIONS_H_INCLUDED

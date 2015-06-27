@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1435347689 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\main.c
+1435374600 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\main.c
 	<stdlib.h>
 	<stdio.h>
 	<allegro5/allegro.h>
@@ -250,11 +250,11 @@
 	"allegro5/allegro.h"
 	"allegro5/allegro_font.h"
 
-1435349047 c:\users\gustavo\documents\github\shockeffect\shockeffect\objects.h
+1435361941 c:\users\gustavo\documents\github\shockeffect\shockeffect\objects.h
 
-1435345479 c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.h
+1435374364 c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.h
 
-1435349908 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.c
+1435421836 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.c
 	<stdlib.h>
 	<stdio.h>
 	<allegro5/allegro.h>
@@ -265,4 +265,14 @@
 	"objects.h"
 
 1362338300 c:\users\gustavo\documents\ifsc\0-softwares\codeblocks\allegro-5.0.10-mingw-4.7.0\include\allegro5\allegro_image.h
+
+1435365457 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\backs.c
+	<stdlib.h>
+	<stdio.h>
+	<allegro5/allegro.h>
+	<allegro5/allegro_primitives.h>
+	<allegro5/allegro_native_dialog.h>
+	<allegro5/allegro_font.h>
+	<allegro5/allegro_ttf.h>
+	"objects.h"
 

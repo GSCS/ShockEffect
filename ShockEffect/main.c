@@ -20,12 +20,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //GLOBALS
-const int WIDTH = 1200; //largura display
-const int HEIGHT = 600; //altura display
+int WIDTH; //largura display
+int HEIGHT; //altura display
 const int GRAVITY = 1;
 const int FPS = 60;
-const int back_x = 930; //ponto x do fundo do background
-const int back_y = 300; //ponto y do fundo do background
+int back_x; //ponto x do fundo do background
+int back_y; //ponto y do fundo do background
 enum KEYS {UP, DOWN, LEFT, RIGHT, Q, W, E, R};
 bool keys[8] = {false, false, false, false, false, false, false, false};
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +33,9 @@ bool keys[8] = {false, false, false, false, false, false, false, false};
 //main
 int main()
 {
+    int letra;
+    OpcaoBackground(letra);
+
     //primitive variables
     int NUM_ENEMYRED = 10; //quantidade de inimigos vermelhos
     int NUM_ENEMYBLUE = 10; //quantidade de inimigos azuis
@@ -52,7 +55,13 @@ int main()
     struct Shoot shootW;
     struct Shoot shootE;
     struct Obstacle obstacle;
-    struct Background background;
+    struct Sprite background;
+    struct Sprite background1;
+    struct Sprite background2;
+    struct Sprite background3;
+    struct Sprite background4;
+    struct Sprite background5;
+    struct Sprite enemyred_sprite;
 
     //allegro variables
     ALLEGRO_DISPLAY *display;
@@ -92,8 +101,8 @@ int main()
 
     event_queue = al_create_event_queue();
     timer = al_create_timer(1.0 / FPS);
-    medium_font = al_load_font("fonts/EHSMB.TTF", 50, 0);
-    title_font = al_load_font("fonts/French Electric Techno.ttf", 200, 0);
+    medium_font = al_load_font("fonts/EHSMB.TTF", WIDTH/20, 0);
+    title_font = al_load_font("fonts/French Electric Techno.ttf", WIDTH/8, 0);
     if (!title_font)
     {
         al_destroy_display(display);
@@ -113,7 +122,14 @@ int main()
     InitShootE(shootE); //funcao que inicializa habilidade de escudo (shield / resistor)
     InitObstacle(obstacle); //funcao que inicializa obstaculos
     InitBoss(boss, &NUM_BOSS); //funcao que inicializa chefes (bosses)
-    InitBackground(background);
+    InitBackground(background, letra); //funcao que inicializa sprite de background
+    InitBackground1(background1, letra); //funcao que inicializa sprite de background1 alternativo
+    InitBackground2(background2, letra); //funcao que inicializa sprite de background2 alternativo
+    InitBackground3(background3, letra); //funcao que inicializa sprite de background3 alternativo
+    InitBackground4(background4, letra); //funcao que inicializa sprite de background4 alternativo
+    InitBackground5(background5, letra); //funcao que inicializa sprite de background4 alternativo
+    InitEnemyredSprite(enemyred_sprite); // funcao que inicializa sprite de inimigo vermelho
+
 
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
@@ -236,22 +252,27 @@ int main()
         {
             redraw = false;
 
-            DrawBackground(background);
+            DrawBackground(background, letra);
+            DrawBackground1(background1, letra);
+            DrawBackground2(background2, letra);
+            DrawBackground3(background3, letra);
+            DrawBackground4(background4, letra);
+            DrawBackground5(background5, letra);
             DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss);
             DrawShootQ(shootQ);
             DrawShootW(shootW);
             DrawShootE(shootE, player);
-            DrawEnemyRed(enemyred, &NUM_ENEMYRED, player);
+            DrawEnemyRed(enemyred, &NUM_ENEMYRED, player, enemyred_sprite);
             DrawEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player);
             DrawBoss(boss, &NUM_BOSS, player);
             DrawObstacle(obstacle);
             DrawPlayer(player);
-            al_draw_filled_circle(930, 300, 10, al_map_rgb(255, 255, 255));
-
 
             al_flip_display();
         }
     }
+
+    //destruir coisas
 
     al_destroy_event_queue(event_queue);
     al_destroy_timer(timer);
@@ -261,6 +282,26 @@ int main()
     for(b=0; b<background.frame_max; b++)
     {
         al_destroy_bitmap(background.image[b]);
+    }
+    for(b=0; b<background1.frame_max; b++)
+    {
+        al_destroy_bitmap(background1.image[b]);
+    }
+    for(b=0; b<background2.frame_max; b++)
+    {
+        al_destroy_bitmap(background2.image[b]);
+    }
+    for(b=0; b<background3.frame_max; b++)
+    {
+        al_destroy_bitmap(background3.image[b]);
+    }
+    for(b=0; b<background4.frame_max; b++)
+    {
+        al_destroy_bitmap(background4.image[b]);
+    }
+    for(b=0; b<background5.frame_max; b++)
+    {
+        al_destroy_bitmap(background5.image[b]);
     }
 
     return 0;

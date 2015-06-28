@@ -5,8 +5,7 @@
 enum IDS{PLAYER, ENEMY, SHOOT};
 
 //estrutura do player
-struct Player
-{
+struct Player {
     char ID;
     int x; //posição x
     int y; //posição y
@@ -25,6 +24,8 @@ struct Player
     int boundy; //(?) descobrir ainda
     int score;
     int death_counter;
+
+    ALLEGRO_SAMPLE *sample[5];
 };
 
 struct Enemy_red
@@ -61,8 +62,7 @@ struct Enemy_blue
     bool alive;
 };
 
-struct Boss
-{
+struct Boss {
     char ID;
     float x;
     float real_x;
@@ -78,10 +78,11 @@ struct Boss
     int lives;
     bool alive;
     bool lived;
+
+    ALLEGRO_SAMPLE *sample;
 };
 
-struct Shoot
-{
+struct Shoot {
     char ID;
     int x;
     int y;
@@ -89,10 +90,11 @@ struct Shoot
     int temp;
     int s;
     bool live;
+
+    struct ALLEGRO_SAMPLE *sample;
 };
 
-struct Obstacle
-{
+struct Obstacle {
     char ID;
     float x;
     float y;
@@ -105,6 +107,18 @@ struct Obstacle
     bool alive;
 };
 
+struct SpriteScientist {
+    ALLEGRO_BITMAP *bitmap;
+    int frameDelay;
+    int frameCount;
+    int frameWidth;
+    int frameHeight;
+    int maxFrame;
+    int curFrameA;
+    int curFrameB;
+    int curFrameC;
+};
+
 struct Sprite
 {
     int x;
@@ -114,8 +128,7 @@ struct Sprite
     int frame_count;
     int frame_delay;
 
-    ALLEGRO_BITMAP *image[20];
+    ALLEGRO_BITMAP *image[40];
 };
-
 
 #endif

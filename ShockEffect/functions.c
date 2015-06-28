@@ -9,14 +9,20 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/bitmap.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_image.h>
 #include "objects.h" //arquivo de objetos
 
 //GLOBALS
 extern int WIDTH; //largura display
 extern int HEIGHT; //altura display
 extern const int GRAVITY = 1; //gravidade padrao em 1
+extern const int FPS = 60;
 extern int back_x;
 extern int back_y;
+
 
 //funcao para iniciar jogador
 void InitPlayer(Player &player, int *text_color)
@@ -40,14 +46,72 @@ void InitPlayer(Player &player, int *text_color)
     player.score = 0;
     player.death_counter = 0;
     *text_color=0;
+    player.sample[0] = al_load_sample("sounds/1/dead.wav");
+    player.sample[1] = al_load_sample("sounds/1/shield.wav");
+    player.sample[2] = al_load_sample("sounds/1/shieldoff.wav");
+    player.sample[3] = al_load_sample("sounds/1/shieldcolision.wav");
+    player.sample[4] = al_load_sample("sounds/1/playerdamage.wav");
 };
 
-//funcao para desenhar jogador
-void DrawPlayer(struct Player &player)
+void InitScientist(SpriteScientist &scientist)
+{
+    scientist.frameCount = 0;
+    scientist.frameDelay = 6;
+    scientist.frameWidth = 62;
+    scientist.frameHeight = 80;
+    scientist.maxFrame = 2;
+    scientist.curFrameA = 0;
+    scientist.curFrameB = 0;
+    scientist.curFrameC = 0;
+
+}
+void DrawScientist(Player &player, SpriteScientist &scientist, bool *LEFT, bool *RIGHT)
 {
     if(player.alive)
     {
-        al_draw_filled_rectangle(player.x, player.y, player.x + 40, player.y - 70 , al_map_rgb(0, 175, 255));
+        if(*LEFT)
+        {
+            al_draw_bitmap_region(scientist.bitmap, scientist.curFrameB*scientist.frameWidth, 80, scientist.frameWidth, scientist.frameHeight, player.x, player.y - 80, 0);
+            scientist.frameCount++;
+            if(scientist.frameDelay == scientist.frameCount)
+            {
+                scientist.curFrameB++;
+                scientist.frameCount = 0;
+                if (scientist.curFrameB > scientist.maxFrame)
+                {
+                    scientist.curFrameB = 0;
+                }
+            }
+
+        }
+        else if(*RIGHT)
+        {
+            al_draw_bitmap_region(scientist.bitmap, scientist.curFrameC*scientist.frameWidth, 160, scientist.frameWidth, scientist.frameHeight, player.x, player.y - 80, 0);
+            scientist.frameCount++;
+            if(scientist.frameDelay == scientist.frameCount)
+            {
+                scientist.curFrameC++;
+                scientist.frameCount = 0;
+                if (scientist.curFrameC > scientist.maxFrame)
+                {
+                    scientist.curFrameC = 0;
+                }
+            }
+        }
+        else
+        {
+            al_draw_bitmap_region(scientist.bitmap, scientist.curFrameA*scientist.frameWidth, 240, scientist.frameWidth, scientist.frameHeight, player.x, player.y - 80, 0);
+            scientist.frameCount++;
+            if(scientist.frameDelay == scientist.frameCount)
+            {
+                scientist.curFrameA++;
+                scientist.frameCount = 0;
+                if (scientist.curFrameA > scientist.maxFrame)
+                {
+                    scientist.curFrameA = 0;
+                }
+            }
+        }
     }
 }
 
@@ -136,6 +200,7 @@ void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_
     if(player.lives <= 0)
     {
         player.alive = false;
+        al_play_sample(player.sample[0], 0.8, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
     if(player.alive == false)
     {
@@ -208,7 +273,6 @@ void TransportPlayer(struct Player &player)
             player.y = HEIGHT;
             player.x = -(player.boundx/2);
             player.inverted = false;
-
         }
     }
 }
@@ -220,6 +284,7 @@ void InitShootQ(struct Shoot &shootQ)
     shootQ.ID = SHOOT;
     shootQ.live = false;
     shootQ.speed = 0;
+    shootQ.sample = al_load_sample("sounds/1/laser_fastshot.wav");
 }
 
 //funcao para desenhar tiro Q
@@ -241,6 +306,7 @@ void FireShootQ(struct Shoot &shootQ, struct Player &player)
             shootQ.x = (player.x) + 20;
             shootQ.y = (player.y) - 70;
             shootQ.live = true;
+            al_play_sample(shootQ.sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
         }
         if(player.inverted)
         {
@@ -260,7 +326,7 @@ void UpdateShootQ(struct Shoot &shootQ, struct Player &player)
         {
             shootQ.speed += GRAVITY;
             shootQ.y -= shootQ.speed;
-            if ((shootQ.y) < 0)
+            if ((shootQ.y) < HEIGHT/2)
             {
                 shootQ.live = false;
                 shootQ.speed = 0;
@@ -270,7 +336,7 @@ void UpdateShootQ(struct Shoot &shootQ, struct Player &player)
         {
             shootQ.speed += GRAVITY;
             shootQ.y += shootQ.speed;
-            if ((shootQ.y) > HEIGHT)
+            if ((shootQ.y) > HEIGHT/2)
             {
                 shootQ.live = false;
                 shootQ.speed = 0;
@@ -286,6 +352,7 @@ void InitShootW(struct Shoot &shootW)
     shootW.ID = SHOOT;
     shootW.live = false;
     shootW.speed = 10;
+    shootW.sample = al_load_sample("sounds/1/laser_widebeam.wav");
 }
 
 //funcao para desenhar tiro W
@@ -307,6 +374,7 @@ void FireShootW(struct Shoot &shootW, struct Player &player)
             shootW.x = (player.x) + 20;
             shootW.y = (player.y) - 70;
             shootW.live = true;
+            al_play_sample(shootW.sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
         }
         if(player.inverted)
         {
@@ -326,7 +394,7 @@ void UpdateShootW(struct Shoot &shootW, struct Player &player)
         {
             shootW.speed += GRAVITY;
             shootW.y -= shootW.speed;
-            if ((shootW.y) < 0)
+            if ((shootW.y) < HEIGHT/2)
             {
                 shootW.live = false;
                 shootW.speed = 0;
@@ -336,7 +404,7 @@ void UpdateShootW(struct Shoot &shootW, struct Player &player)
         {
             shootW.speed += GRAVITY;
             shootW.y += shootW.speed;
-            if ((shootW.y) > HEIGHT)
+            if ((shootW.y) > HEIGHT/2)
             {
                 shootW.live = false;
                 shootW.speed = 0;
@@ -354,24 +422,27 @@ void InitShootE(Shoot &shootE)
     shootE.temp = 0;
     shootE.s = 0;
 }
-void DrawShootE(Shoot &shootE, Player &player)
+
+void DrawShootE(ALLEGRO_BITMAP *shield, Shoot &shootE, Player &player)
 {
     if (shootE.live)
     {
-        shootE.x = player.x;
-        shootE.y = player.y - player.boundy;
-        al_draw_line((shootE.x), (shootE.y), ((shootE.x) + 40), (shootE.y), al_map_rgb(255, 0, 0), 20);
+        shootE.x = player.x - player.boundx * 0.70;
+        shootE.y = player.y - 1.45 * player.boundy;
+        al_draw_bitmap(shield, shootE.x, shootE.y, 0);
     }
 }
+
 void FireShootE(Shoot &shootE, Player &player)
 {
     if (!(shootE.live))
     {
-        shootE.x = player.x;
-        shootE.y = player.y - 70;
+        shootE.x = player.x - player.boundx * 0.70;
+        shootE.y = player.y - 1.45 * player.boundy;
         shootE.live = true;
-        shootE.temp = 3;
+        shootE.temp = 5;
         player.shield = true;
+        al_play_sample(player.sample[1], 0.8, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
 }
 
@@ -385,10 +456,11 @@ void UpdateShootE(Shoot &shootE, Player &player)
         {
             shootE.temp --;
             shootE.s = 0;
-            if(shootE.temp == 0)
+            if (!shootE.temp)
             {
                 shootE.live = false;
                 player.shield = false;
+                al_play_sample(player.sample[2], 0.8, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
         }
     }
@@ -453,8 +525,10 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
     *num_enemies = 1;
     if(player.score > 10)
         *num_enemies = 2;
-    if(player.score > 30)
+    if(player.score > 50)
         *num_enemies = 3;
+    if(player.score > 150)
+        *num_enemies = 4;
     int j;
     for(j=0; j < *num_enemies; j++)
     {
@@ -465,8 +539,11 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
         if(enemyred[j].x - enemyred[j].boundx > WIDTH ||
                 enemyred[j].x + enemyred[j].boundx < 0 ||
                 enemyred[j].y + enemyred[j].boundy < 0 ||
-                enemyred[j].y - enemyred[j].boundy > HEIGHT)
+                enemyred[j].y - enemyred[j].boundy > HEIGHT){
             enemyred[j].alive = false;
+            player.lives--;
+            al_play_sample(player.sample[3], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+            }
         if(enemyred[j].alive)
         {
             enemyred[j].velx += enemyred[j].speedx;
@@ -512,8 +589,8 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
         if(enemyblue[j].alive && player.score >= 6)
         {
             al_draw_filled_circle(enemyblue[j].x, enemyblue[j].y, enemyblue[j].size_enemy, al_map_rgb(0, enemyblue[j].size_enemy * 6, enemyblue[j].size_enemy * 6));
-            al_draw_filled_rectangle(enemyblue[j].x + 10, enemyblue[j].y - 5, enemyblue[j].x + enemyblue[j].size_enemy, enemyblue[j].y - enemyblue[j].size_enemy, al_map_rgb(150, enemyblue[j].size_enemy, enemyblue[j].size_enemy + 100));
-            al_draw_filled_rectangle(enemyblue[j].x - 10, enemyblue[j].y - 5, enemyblue[j].x - enemyblue[j].size_enemy, enemyblue[j].y + enemyblue[j].size_enemy, al_map_rgb(enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy + 100, enemyblue[j].size_enemy));
+            al_draw_filled_rectangle(enemyblue[j].x + 10, enemyblue[j].y - 5, enemyblue[j].x + enemyblue[j].size_enemy, enemyblue[j].y - enemyblue[j].size_enemy, al_map_rgb(50, 0, enemyblue[j].size_enemy + 100));
+            al_draw_filled_rectangle(enemyblue[j].x - 10, enemyblue[j].y - 5, enemyblue[j].x - enemyblue[j].size_enemy, enemyblue[j].y + enemyblue[j].size_enemy, al_map_rgb(enemyblue[j].size_enemy, 0, enemyblue[j].size_enemy + 100));
         }
         else if(enemyblue[j].alive == false)
         {
@@ -524,12 +601,15 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
     }
 }
 
+
 //funcao para atualizar inimigo azul
 void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player, struct Shoot &shootW)
 {
     *num_enemies = 1;
     if(player.score > 10)
         *num_enemies = 2;
+    if(player.score > 100)
+        *num_enemies = 3;
     int j;
     for(j=0; j < *num_enemies; j++)
     {
@@ -541,6 +621,7 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
         {
             enemyblue[j].alive = false;
             player.lives -= 1;
+            al_play_sample(player.sample[3], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
         }
         if(enemyblue[j].alive && player.score >= 6)
         {
@@ -578,8 +659,6 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
         }
     }
 }
-
-
 //funcao de colisao de tiro Q com inimigo vermelho
 void ShootQColisionEnemyRed(struct Shoot &shootQ, struct Enemy_red enemyred[], int *num_enemies, struct Player &player)
 {
@@ -646,8 +725,14 @@ void PlayerColisionEnemyRed(struct Player &player, struct Enemy_red enemyred[], 
                 enemyred[j].alive = false;
                 player.jump = true;
                 player.score += 2;
+                if(player.shield)
+                    al_play_sample(player.sample[3], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
                 if(!player.shield)
+                {
                     player.lives -= 1;
+                    if(player.lives > 0)
+                        al_play_sample(player.sample[4], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
             }
         }
     }
@@ -671,8 +756,14 @@ void PlayerColisionEnemyBlue(struct Player &player, struct Enemy_blue enemyblue[
                 enemyblue[j].alive = false;
                 player.jump = true;
                 player.score += 1;
-                if(!player.shield)
+                if(player.shield)
+                    al_play_sample(player.sample[3], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+                if(!player.shield && player.lives > 1)
+                {
                     player.lives -= 1;
+                    if(player.lives > 0)
+                        al_play_sample(player.sample[4], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
             }
         }
     }
@@ -714,30 +805,26 @@ void UpdateObstacle(Obstacle &obstacle, ALLEGRO_FONT *medium_font, Player &playe
         obstacle.alive = true;
     if(obstacle.alive)
     {
-        if(obstacle.y >- 21 || obstacle.y < HEIGHT+21)
+        if(obstacle.y>-21 || obstacle.y < HEIGHT+21)
         {
             if(obstacle.size_obst<obstacle.real_size_obst)
                 obstacle.size_obst++;
-            if(obstacle.x > player.x)
-                obstacle.x -= obstacle.velx;
-            if(obstacle.x < player.x)
-                obstacle.x += obstacle.velx;
+            if(obstacle.x>player.x)
+                obstacle.x-=obstacle.velx;
+            if(obstacle.x<player.x)
+                obstacle.x+=obstacle.velx;
             if(!player.inverted)
             {
                 obstacle.vely += obstacle.speed;
-                obstacle.y += obstacle.vely;
-                if(obstacle.y > (HEIGHT-50) &&
-                        player.x >= obstacle.x &&
-                        player.x + player.boundx <= obstacle.x+obstacle.size_obst)
-                    al_draw_textf(medium_font, al_map_rgb(255, 0, 0), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTRE, "JUMP!");
+                obstacle.y+=obstacle.vely;
             }
             if(player.inverted)
             {
                 obstacle.vely += obstacle.speed;
-                obstacle.y -= obstacle.vely;
-                if(obstacle.y < (50) &&
-                        player.x >= obstacle.x &&
-                        player.x + player.boundx <= obstacle.x + obstacle.size_obst)
+                obstacle.y-=obstacle.vely;
+                if(obstacle.y<(50) &&
+                        player.x>=obstacle.x &&
+                        player.x+player.boundx <= obstacle.x+obstacle.size_obst)
                     al_draw_textf(medium_font, al_map_rgb(255, 0, 0), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTRE, "JUMP!");
             }
         }
@@ -774,15 +861,21 @@ void PlayerColisionObstacle(Player &player, Obstacle &obstacle)
             obstacle.real_size_obst = 250;
             obstacle.alive = false;
             obstacle.score = player.score + 5;
+            if(player.shield)
+                al_play_sample(player.sample[3], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
             if(!player.shield)
+            {
                 player.lives -= 1;
+                if(player.lives > 0)
+                    al_play_sample(player.sample[4], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+            }
             player.jump = true;
         }
     }
 }
 
 //funcao para escrever textos
-void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &player, Boss boss[], int *num_boss, int *text_color, int *text_boss)
+void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &player, Boss boss[], int *num_boss, int *text_color, int *text_boss, struct Obstacle &obstacle)
 {
     if(*text_color > 1)
         al_draw_text(title_font, al_map_rgb(*text_color, 0, 0), WIDTH/2, 150, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
@@ -797,6 +890,10 @@ void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &playe
     }
     al_draw_textf(medium_font, al_map_rgb(255, 255, 255), 50, 20, ALLEGRO_ALIGN_LEFT, "Score: %d", player.score);
     al_draw_textf(medium_font, al_map_rgb(255, 255, 255), WIDTH - 50, 20, ALLEGRO_ALIGN_RIGHT, "Lives: %d", player.lives);
+     if(obstacle.y>(HEIGHT-50) &&
+                        player.x>=obstacle.x &&
+                        player.x+player.boundx <= obstacle.x+obstacle.size_obst)
+                    al_draw_textf(medium_font, al_map_rgb(255, 0, 0), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTRE, "JUMP!");
 }
 
 //funcao para mudar valor de color (referente a cor de texto)
@@ -811,7 +908,7 @@ void ChangeColor(int *text_color, struct Player &player, struct Boss boss[], int
     {
         if(boss[j].alive && *text_boss > 1)
             *text_boss -= 1;
-        if(*text_boss == 1)
+        if(*text_boss == 0)
             *text_boss = 255;
     }
 }
@@ -855,7 +952,7 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
 }
 
 //funcao para atualizar boss
-void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_enemyred, struct Enemy_blue enemyblue[], int *num_enemyblue)
+void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_enemyred, struct Enemy_blue enemyblue[], int *num_enemyblue, ALLEGRO_SAMPLE *musicaboss)
 {
     *num_boss = 0;
     if(player.score > 20 && boss[0].lived == false)
@@ -867,6 +964,11 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
     {
         boss[1].alive = true;
         *num_boss = 2;
+    }
+    if(player.score > 250 && boss[1].lived == false)
+    {
+        boss[2].alive = true;
+        *num_boss = 3;
     }
     int k;
     int j;
@@ -930,9 +1032,11 @@ void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss
                 player.lives--;
                 boss[j].lives--;
                 boss[j].real_y = HEIGHT/2;
-                boss[j].x = WIDTH*0.1 + (rand() % WIDTH*0.8);
+                boss[j].x = WIDTH * 0.1 + (rand() % WIDTH * 0.8);
                 player.jump = true;
                 player.score += 1;
+                if(player.lives > 0)
+                    al_play_sample(player.sample[4], 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
         }
     }
@@ -955,7 +1059,7 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
                     shootW.y > (boss[j].y - boss[j].boundy))
             {
                 boss[j].lives--;
-                boss[j].x =  WIDTH*0.1 + (rand() % WIDTH*0.8);
+                boss[j].x = WIDTH * 0.1 + (rand() % WIDTH * 0.8);
                 player.score += 1;
             }
             if(shootQ.live &&
@@ -965,7 +1069,7 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
                     shootQ.y > (boss[j].y - boss[j].boundy))
             {
                 boss[j].lives--;
-                boss[j].x =  WIDTH*0.1 + (rand() % WIDTH*0.8);
+                boss[j].x = WIDTH * 0.1 + (rand() % WIDTH * 0.8);
                 player.score += 1;
             }
         }
@@ -1272,7 +1376,7 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza\n 4 - LSD World\n 5 - Luz, luz!\n 6 - Preto no Branco\n 7 - Tudo azul...\n");
+    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza (LSD World) \n 4 - Paz e Amor\n 5 - Luz, luz!\n 6 - Preto no Branco\n 7 - Tudo azul...\n");
     scanf("%d", &letra);
     if(letra == 1)
     {

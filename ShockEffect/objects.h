@@ -2,10 +2,11 @@
 #define __objects_h
 
 //obj IDS (para indentificar o objeto)
-enum IDS{PLAYER, ENEMY, SHOOT};
+enum IDS {PLAYER, ENEMY, SHOOT};
 
 //estrutura do player
-struct Player {
+struct Player
+{
     char ID;
     int x; //posição x
     int y; //posição y
@@ -23,9 +24,11 @@ struct Player {
     int boundx; //(?) descobrir ainda
     int boundy; //(?) descobrir ainda
     int score;
+    int energy;
     int death_counter;
 
-    ALLEGRO_SAMPLE *sample[5];
+    ALLEGRO_SAMPLE *sample[7];
+    ALLEGRO_SAMPLE_INSTANCE *instance[2];
 };
 
 struct Enemy_red
@@ -38,11 +41,15 @@ struct Enemy_red
     float velx;
     float speedx;
     float vely;
+    float width;
+    float height;
     int boundx;
     int boundy;
     int real_size_enemy;
     bool moving;
     bool alive;
+
+    ALLEGRO_BITMAP *image;
 };
 
 struct Enemy_blue
@@ -55,14 +62,19 @@ struct Enemy_blue
     float size_enemy;
     float velx;
     float vely;
+    float width;
+    float height;
     int boundx;
     int boundy;
     float real_size_enemy;
     bool moving;
     bool alive;
+
+    ALLEGRO_BITMAP *image;
 };
 
-struct Boss {
+struct Boss
+{
     char ID;
     float x;
     float real_x;
@@ -78,23 +90,32 @@ struct Boss {
     int lives;
     bool alive;
     bool lived;
+    bool instance_played;
 
-    ALLEGRO_SAMPLE *sample;
+    ALLEGRO_SAMPLE *sample[2];
+    ALLEGRO_SAMPLE_INSTANCE *instance[2];
 };
 
-struct Shoot {
+struct Shoot
+{
     char ID;
-    int x;
-    int y;
+    float x;
+    float y;
     int speed;
     int temp;
     int s;
+    float width;
+    float height;
+    float boundx;
+    float boundy;
     bool live;
 
+    ALLEGRO_BITMAP *bitmap;
     struct ALLEGRO_SAMPLE *sample;
 };
 
-struct Obstacle {
+struct Obstacle
+{
     char ID;
     float x;
     float y;
@@ -107,7 +128,8 @@ struct Obstacle {
     bool alive;
 };
 
-struct SpriteScientist {
+struct SpriteScientist
+{
     ALLEGRO_BITMAP *bitmap;
     int frameDelay;
     int frameCount;

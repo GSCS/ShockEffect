@@ -40,6 +40,7 @@ struct Enemy_red
     float size_enemy;
     float velx;
     float speedx;
+    float speed_size;
     float vely;
     float width;
     float height;
@@ -82,18 +83,21 @@ struct Boss
     float real_y;
     float speed;
     float size_boss;
-    int velx;
-    int vely;
-    int boundx;
-    int boundy;
-    int real_size_boss;
+    float width;
+    float height;
+    float velx;
+    float vely;
+    float boundx;
+    float boundy;
+    float real_size_boss;
     int lives;
     bool alive;
     bool lived;
     bool instance_played;
 
-    ALLEGRO_SAMPLE *sample[2];
-    ALLEGRO_SAMPLE_INSTANCE *instance[2];
+    ALLEGRO_BITMAP *image;
+    ALLEGRO_SAMPLE *sample[3];
+    ALLEGRO_SAMPLE_INSTANCE *instance[3];
 };
 
 struct Shoot
@@ -110,7 +114,7 @@ struct Shoot
     float boundy;
     bool live;
 
-    ALLEGRO_BITMAP *bitmap;
+    ALLEGRO_BITMAP *bitmap[3];
     struct ALLEGRO_SAMPLE *sample;
 };
 

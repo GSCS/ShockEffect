@@ -13,14 +13,14 @@ void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_
 void TransportPlayer(Player &player);
 
 //Funções shootQ
-void InitShootQ(struct Shoot &shootQ);
-void DrawShootQ(struct Shoot &shootQ);
+void InitShootQ(struct Shoot &shootQ, int letra);
+void DrawShootQ(struct Shoot &shootQ, int letra, struct Boss boss[]);
 void FireShootQ(struct Shoot &shootQ, struct Player &player);
 void UpdateShootQ(struct Shoot &shootQ, struct Player &player);
 
 //Funções shootW
-void InitShootW(struct Shoot &shootW);
-void DrawShootW(struct Shoot &shootW);
+void InitShootW(struct Shoot &shootW, int letra);
+void DrawShootW(struct Shoot &shootW, int letra, struct Boss boss[]);
 void FireShootW(struct Shoot &shootW, struct Player &player);
 void UpdateShootW(struct Shoot &shootW, struct Player &player);
 
@@ -31,14 +31,14 @@ void FireShootE(Shoot &shootE, Player &player);
 void UpdateShootE(Shoot &shootE, Player &player);
 
 //Funções enemyred
-void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies);
+void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies, int letra);
 void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player, struct Sprite &enemyred_sprite);
 void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &player, struct Shoot &shootQ);
 void ShootQColisionEnemyRed(struct Shoot &shootQ, struct Enemy_red enemyred[], int *num_enemies, struct Player &player);
 void PlayerColisionEnemyRed(struct Player &player, struct Enemy_red enemyred[], int *num_enemies);
 
 //Funções enemyblue
-void InitEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies);
+void InitEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, int letra);
 void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player);
 void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player, struct Shoot &shootQ);
 void ShootWColisionEnemyBlue(struct Shoot &shootW, struct Enemy_blue enemyblue[], int *num_enemies, struct Player &player);
@@ -48,7 +48,7 @@ void PlayerColisionEnemyBlue(struct Player &player, struct Enemy_blue enemyblue[
 void InitBoss(struct Boss boss[], int *num_boss, int letra);
 void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player);
 void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_red, struct Enemy_blue enemyblue[], int *num_blue, int letra);
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6);
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666);
 void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss);
 void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss boss[], int *num_boss, struct Player &player);
 

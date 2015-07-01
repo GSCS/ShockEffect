@@ -47,13 +47,13 @@ void InitPlayer(Player &player, int *text_color)
     player.death_counter = 0;
     player.energy = 0;
     *text_color=0;
-    player.sample[0] = al_load_sample("sounds/1/dead.wav");
-    player.sample[1] = al_load_sample("sounds/1/shield.wav");
-    player.sample[2] = al_load_sample("sounds/1/shieldoff.wav");
-    player.sample[3] = al_load_sample("sounds/1/shieldcolision.wav");
-    player.sample[4] = al_load_sample("sounds/1/playerdamage.wav");
-    player.sample[5] = al_load_sample("sounds/1/lives2.ogg");
-    player.sample[6] = al_load_sample("sounds/1/lives1.ogg");
+    player.sample[0] = al_load_sample("sounds/dead.wav");
+    player.sample[1] = al_load_sample("sounds/shield.wav");
+    player.sample[2] = al_load_sample("sounds/shieldoff.wav");
+    player.sample[3] = al_load_sample("sounds/shieldcolision.wav");
+    player.sample[4] = al_load_sample("sounds/playerdamage.wav");
+    player.sample[5] = al_load_sample("sounds/lives2.ogg");
+    player.sample[6] = al_load_sample("sounds/lives1.ogg");
     player.instance[0] = al_create_sample_instance(player.sample[5]);
     player.instance[1] = al_create_sample_instance(player.sample[6]);
     al_attach_sample_instance_to_mixer(player.instance[0], al_get_default_mixer());
@@ -268,6 +268,8 @@ void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_
             boss[j].real_y = boss[j].y;
             boss[j].speed = 0.1;
             boss[j].size_boss = 0;
+            boss[j].width = al_get_bitmap_width(boss[j].image);
+            boss[j].height = al_get_bitmap_height(boss[j].image);
             boss[j].velx = 2;
             boss[j].vely = 15;
             boss[j].boundx = 0;
@@ -322,21 +324,43 @@ void TransportPlayer(struct Player &player)
 
 //funcoes poder indutor "Q"//////////////////////////////////////////////////
 //funcao para iniciar tiro Q
-void InitShootQ(struct Shoot &shootQ)
+void InitShootQ(struct Shoot &shootQ, int letra)
 {
     shootQ.ID = SHOOT;
     shootQ.live = false;
     shootQ.speed = 0;
-    shootQ.bitmap = al_load_bitmap("images/shootQ.png");
-    shootQ.sample = al_load_sample("sounds/1/laser_fastshot.wav");
+    if(letra != 666)
+        shootQ.bitmap[0] = al_load_bitmap("images/shootQ.png");
+    if(letra == 666)
+    {
+        shootQ.bitmap[1] = al_load_bitmap("images/shoot_samir.png");
+        shootQ.bitmap[2] = al_load_bitmap("images/shoot_mussoi.png");
+    }
+    shootQ.sample = al_load_sample("sounds/laser_fastshot.wav");
 }
 
 //funcao para desenhar tiro Q
-void DrawShootQ(struct Shoot &shootQ)
+void DrawShootQ(struct Shoot &shootQ, int letra, struct Boss boss[])
 {
     if(shootQ.live)
     {
-        al_draw_scaled_bitmap(shootQ.bitmap, 0, 0, 30, 30, shootQ.x, shootQ.y, shootQ.width, shootQ.height, 0);
+        if(letra != 666)
+            al_draw_scaled_bitmap(shootQ.bitmap[0], 0, 0, 30, 30, shootQ.x, shootQ.y, shootQ.width, shootQ.height, 0);
+        if(letra == 666)
+        {
+            if(!boss[0].alive &&
+                    !boss[1].alive &&
+                    !boss[2].alive &&
+                    !boss[3].alive &&
+                    !boss[4].alive)
+                al_draw_scaled_bitmap(shootQ.bitmap[1], 0, 0, 30, 30, shootQ.x, shootQ.y, shootQ.width, shootQ.height, 0);
+            if(boss[0].alive ||
+                    boss[1].alive ||
+                    boss[2].alive ||
+                    boss[3].alive ||
+                    boss[4].alive)
+                al_draw_scaled_bitmap(shootQ.bitmap[2], 0, 0, 30, 30, shootQ.x, shootQ.y, shootQ.width, shootQ.height, 0);
+        }
     }
 }
 
@@ -393,21 +417,43 @@ void UpdateShootQ(struct Shoot &shootQ, struct Player &player)
 
 //funcoes poder capacitor "W"//////////////////////////////////////////////////
 //funcao para iniciar tiro W
-void InitShootW(struct Shoot &shootW)
+void InitShootW(struct Shoot &shootW, int letra)
 {
     shootW.ID = SHOOT;
     shootW.live = false;
     shootW.speed = 10;
-    shootW.bitmap = al_load_bitmap("images/shootW.png");
-    shootW.sample = al_load_sample("sounds/1/laser_widebeam.wav");
+    if(letra != 666)
+        shootW.bitmap[0] = al_load_bitmap("images/shootW.png");
+    if(letra == 666)
+    {
+        shootW.bitmap[1] = al_load_bitmap("images/shoot_hugo.png");
+        shootW.bitmap[2] = al_load_bitmap("images/shoot_mussoi.png");
+    }
+    shootW.sample = al_load_sample("sounds/laser_widebeam.wav");
 }
 
 //funcao para desenhar tiro W
-void DrawShootW(struct Shoot &shootW)
+void DrawShootW(struct Shoot &shootW, int letra, struct Boss boss[])
 {
-    if (shootW.live)
+    if(shootW.live)
     {
-        al_draw_scaled_bitmap(shootW.bitmap, 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+        if(letra != 666)
+            al_draw_scaled_bitmap(shootW.bitmap[0], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+        if(letra == 666)
+        {
+            if(!boss[0].alive &&
+                    !boss[1].alive &&
+                    !boss[2].alive &&
+                    !boss[3].alive &&
+                    !boss[4].alive)
+                al_draw_scaled_bitmap(shootW.bitmap[1], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+            if(boss[0].alive ||
+                    boss[1].alive ||
+                    boss[2].alive ||
+                    boss[3].alive ||
+                    boss[4].alive)
+                al_draw_scaled_bitmap(shootW.bitmap[2], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+        }
     }
 }
 
@@ -469,7 +515,7 @@ void InitShootE(Shoot &shootE)
     shootE.speed = 0;
     shootE.temp = 0;
     shootE.s = 0;
-    shootE.bitmap = al_load_bitmap("images/shield.png");
+    shootE.bitmap[0] = al_load_bitmap("images/shield.png");
 }
 
 void DrawShootE(Shoot &shootE, Player &player)
@@ -477,8 +523,8 @@ void DrawShootE(Shoot &shootE, Player &player)
     if (shootE.live)
     {
         shootE.x = player.x - player.boundx * 0.9;
-        shootE.y = player.y - 3 * player.boundy;
-        al_draw_bitmap(shootE.bitmap, shootE.x, shootE.y, 0);
+        shootE.y = player.y - 2*player.boundy;
+        al_draw_bitmap(shootE.bitmap[0], shootE.x, shootE.y, 0);
     }
 }
 
@@ -517,18 +563,22 @@ void UpdateShootE(Shoot &shootE, Player &player)
 }
 
 //funcao para iniciar inimigo tipo 1 (vermelho)
-void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies)
+void InitEnemyRed(struct Enemy_red enemyred[], int *num_enemies, int letra)
 {
     int j;
     for(j=0; j < *num_enemies; j++)
     {
         enemyred[j].ID = ENEMY;
-        enemyred[j].image = al_load_bitmap("images/enemyred_0.png");
+        if(letra != 666)
+            enemyred[j].image = al_load_bitmap("images/enemyred_0.png");
+        if(letra == 666)
+            enemyred[j].image = al_load_bitmap("images/samir.png");
         enemyred[j].x = back_x;
         enemyred[j].y = back_y;
         enemyred[j].width = al_get_bitmap_width(enemyred[j].image);
         enemyred[j].height = al_get_bitmap_height(enemyred[j].image);
         enemyred[j].speed = 0.001;
+        enemyred[j].speed_size = 0;
         enemyred[j].speedx = 0.005;
         enemyred[j].size_enemy = 0;
         enemyred[j].velx = 0;
@@ -565,6 +615,7 @@ void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &
             enemyred[j].x= back_x;
             enemyred[j].y = back_y;
             enemyred[j].size_enemy = 0;
+            enemyred[j].speed_size = 0;
             enemyred[j].velx = 0;
             enemyred[j].vely = 0;
         }
@@ -613,7 +664,8 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
             enemyred[j].boundy = enemyred[j].size_enemy;
             enemyred[j].velx += enemyred[j].speedx;
             enemyred[j].vely += enemyred[j].speed;
-            enemyred[j].size_enemy += enemyred[j].vely;
+            enemyred[j].speed_size += (enemyred[j].speed + enemyred[j].speedx);
+            enemyred[j].size_enemy += enemyred[j].speed_size;
             enemyred[j].y += enemyred[j].vely;
             if(enemyred[j].x < player.x)
                 enemyred[j].x += enemyred[j].velx;
@@ -624,13 +676,16 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
 }
 
 //funcao para iniciar inimigo tipo 2 (azul)
-void InitEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies)
+void InitEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, int letra)
 {
     int j;
     for(j=0; j < *num_enemies; j++)
     {
         enemyblue[j].ID = ENEMY;
-        enemyblue[j].image = al_load_bitmap("images/enemyblue_0.png");
+        if(letra != 666)
+            enemyblue[j].image = al_load_bitmap("images/enemyblue_0.png");
+        if(letra == 666)
+            enemyblue[j].image = al_load_bitmap("images/hugo.png");
         enemyblue[j].x = ((back_x) - 10) + (rand() % 20);
         enemyblue[j].y = back_y;
         enemyblue[j].width = al_get_bitmap_width(enemyblue[j].image);
@@ -705,7 +760,7 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
         }
         if(enemyblue[j].alive)
         {
-            enemyblue[j].boundx = enemyblue[j].size_enemy*3;
+            enemyblue[j].boundx = enemyblue[j].size_enemy*4;
             enemyblue[j].boundy = enemyblue[j].size_enemy*2;
             enemyblue[j].size_enemy += enemyblue[j].speed;
             enemyblue[j].velx = enemyblue[j].speedx;
@@ -981,12 +1036,23 @@ void InitBoss(struct Boss boss[], int *num_boss, int letra)
     for(j=0; j < *num_boss; j++)
     {
         boss[j].ID = ENEMY;
+        if(letra != 666)
+            boss[j].image = al_load_bitmap("images/boss_1.png");
+        if(letra == 666)
+        {
+            boss[j].image = al_load_bitmap("images/mussoi.png");
+            boss[j].sample[2] = al_load_sample("sounds/starwars.ogg");
+            boss[j].instance[2] = al_create_sample_instance(boss[j].sample[2]);
+            al_attach_sample_instance_to_mixer(boss[j].instance[2], al_get_default_mixer());
+        }
         boss[j].x = back_x;
         boss[j].y = back_y;
         boss[j].real_y = boss[j].y;
         boss[j].speed = 0.1;
         boss[j].size_boss = 0;
-        boss[j].velx = 2;
+        boss[j].width = al_get_bitmap_width(boss[j].image);
+        boss[j].height = al_get_bitmap_height(boss[j].image);
+        boss[j].velx = 0.5;
         boss[j].vely = 15;
         boss[j].boundx = 0;
         boss[j].boundy = 0;
@@ -996,8 +1062,8 @@ void InitBoss(struct Boss boss[], int *num_boss, int letra)
         boss[j].lived = false;
         boss[j].instance_played = false;
 
-        boss[j].sample[0] = al_load_sample("sounds/1/songboss.ogg");
-        boss[j].sample[1] = al_load_sample("sounds/1/songboss2.ogg");
+        boss[j].sample[0] = al_load_sample("sounds/songboss.ogg");
+        boss[j].sample[1] = al_load_sample("sounds/songboss2.ogg");
         boss[j].instance[0] = al_create_sample_instance(boss[j].sample[0]);
         boss[j].instance[1] = al_create_sample_instance(boss[j].sample[1]);
         al_attach_sample_instance_to_mixer(boss[j].instance[0], al_get_default_mixer());
@@ -1014,9 +1080,10 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
     {
         if(boss[j].alive)
         {
-            al_draw_filled_circle(boss[j].x, boss[j].y, boss[j].size_boss, al_map_rgb(255,0,255));
-            al_draw_filled_rectangle(boss[j].x + 30, boss[j].y - 5, boss[j].x + boss[j].size_boss, boss[j].y - boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, boss[j].size_boss, 0));
-            al_draw_filled_rectangle(boss[j].x - 40, boss[j].y, boss[j].x - boss[j].size_boss, boss[j].y + boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, 50, boss[j].size_boss));
+            al_draw_scaled_bitmap(boss[j].image, 0, 0, back_x, back_y, boss[j].x, boss[j].y, boss[j].boundx, boss[j].boundy, 0);
+            //al_draw_filled_circle(boss[j].x, boss[j].y, boss[j].size_boss, al_map_rgb(255,0,255));
+            //al_draw_filled_rectangle(boss[j].x + 30, boss[j].y - 5, boss[j].x + boss[j].size_boss, boss[j].y - boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, boss[j].size_boss, 0));
+            //al_draw_filled_rectangle(boss[j].x - 40, boss[j].y, boss[j].x - boss[j].size_boss, boss[j].y + boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, 50, boss[j].size_boss));
         }
     }
 }
@@ -1058,7 +1125,9 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
             boss[j].real_y = boss[j].y;
             boss[j].speed = 0.1;
             boss[j].size_boss = 0;
-            boss[j].velx = 2;
+            boss[j].width = al_get_bitmap_width(boss[j].image);
+            boss[j].height = al_get_bitmap_height(boss[j].image);
+            boss[j].velx = 0.5;
             boss[j].vely = 15;
             boss[j].boundx = 0;
             boss[j].boundy = 0;
@@ -1068,13 +1137,16 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
         }
         if(boss[j].alive)
         {
+            boss[j].boundx = boss[j].size_boss*4;
+            boss[j].boundy = boss[j].size_boss*2;
+
             for(k=0; k < *num_enemyred; k++)
                 enemyred[k].alive = false;
             for(k=0; k < *num_enemyblue; k++)
                 enemyblue[k].alive = false;
 
-            if(boss[j].size_boss<boss[j].real_size_boss)
-                boss[j].size_boss+=boss[j].speed;
+            if(boss[j].size_boss < boss[j].real_size_boss)
+                boss[j].size_boss += boss[j].speed;
 
             if(boss[j].y < player.y)
                 boss[j].y += boss[j].speed/2;
@@ -1089,7 +1161,7 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
     }
 }
 
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6)
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666)
 {
     int j;
     for(j=0; j < *num_boss; j++)
@@ -1106,6 +1178,11 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
                 al_stop_sample(musica6id);
                 al_play_sample_instance(boss[j].instance[1]);
             }
+             if(letra == 666)
+            {
+                al_stop_sample(musica666id);
+                al_play_sample_instance(boss[j].instance[2]);
+            }
         }
         if(boss[j].lived && !boss[j].instance_played)
         {
@@ -1113,6 +1190,12 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             {
                 al_stop_sample_instance(boss[j].instance[1]);
                 al_play_sample(musica6, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica6id);
+                boss[j].instance_played = true;
+            }
+            if(letra == 666)
+            {
+                al_stop_sample_instance(boss[j].instance[2]);
+                al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica666id);
                 boss[j].instance_played = true;
             }
         }
@@ -1125,14 +1208,12 @@ void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss
     int j;
     for(j=0; j < *num_boss; j++)
     {
-        boss[j].boundx = boss[j].size_boss;
-        boss[j].boundy = boss[j].size_boss;
         if(boss[j].alive && player.alive)
         {
-            if((boss[j].x + boss[j].size_boss) > player.x &&
-                    (boss[j].x - boss[j].size_boss) < player.x + player.boundx &&
-                    (boss[j].y + boss[j].size_boss) > player.y - player.boundy &&
-                    (boss[j].y - boss[j].size_boss) < player.y)
+            if((boss[j].x + boss[j].boundx) > player.x &&
+                    boss[j].x < player.x + player.boundx &&
+                    (boss[j].y + boss[j].boundy) > player.y &&
+                    boss[j].y < player.y + player.boundy)
             {
                 player.lives--;
                 boss[j].lives--;
@@ -1153,15 +1234,13 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
     int j;
     for(j=0; j < *num_boss; j++)
     {
-        boss[j].boundx = boss[j].size_boss;
-        boss[j].boundy = boss[j].size_boss;
         if(boss[j].alive)
         {
             if(shootW.live &&
                     shootW.x < (boss[j].x + boss[j].boundx) &&
-                    shootW.x > (boss[j].x - boss[j].boundx) &&
+                    (shootW.x + shootW.width) > boss[j].x &&
                     shootW.y < (boss[j].y + boss[j].boundy) &&
-                    shootW.y > (boss[j].y - boss[j].boundy))
+                    (shootW.y + shootW.height) > boss[j].y)
             {
                 boss[j].lives--;
                 boss[j].x = WIDTH * 0.1 + (rand() % WIDTH * 0.8);
@@ -1169,9 +1248,9 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
             }
             if(shootQ.live &&
                     shootQ.x < (boss[j].x + boss[j].boundx) &&
-                    shootQ.x > (boss[j].x - boss[j].boundx) &&
+                    (shootQ.x + shootQ.width) > boss[j].x &&
                     shootQ.y < (boss[j].y + boss[j].boundy) &&
-                    shootQ.y > (boss[j].y - boss[j].boundy))
+                    (shootQ.y + shootQ.height) > boss[j].y)
             {
                 boss[j].lives--;
                 boss[j].x = WIDTH * 0.1 + (rand() % WIDTH * 0.8);
@@ -1183,7 +1262,7 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
 
 void InitBackground(struct Sprite &background, int letra)
 {
-    if(letra == 1)
+    if(letra == 1 || letra == 666)
     {
         background.frame_atual = 0;
         background.frame_count = 0;
@@ -1207,7 +1286,7 @@ void InitBackground(struct Sprite &background, int letra)
 
 void DrawBackground(struct Sprite &background, int letra)
 {
-    if(letra == 1)
+    if(letra == 1 || letra == 666)
     {
         if(++background.frame_count >= background.frame_delay)
         {
@@ -1481,9 +1560,9 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza (LSD World) \n 4 - Paz e Amor\n 5 - Luz, luz!\n 6 - Preto no Branco\n 7 - Tudo azul...\n");
+    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza (LSD World) \n 4 - Paz e Amor\n 5 - Luz, luz!\n 6 - Noir\n 7 - Alem do Infinito\n");
     scanf("%d", &letra);
-    if(letra == 1)
+    if(letra == 1 || letra == 666)
     {
         WIDTH = 1200;
         HEIGHT = 600;
@@ -1532,14 +1611,6 @@ void OpcaoBackground(int &letra)
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
     }
-    else if(letra != 1 &&
-            letra != 2 &&
-            letra != 3 &&
-            letra != 4 &&
-            letra != 5 &&
-            letra != 6 &&
-            letra != 7)
-        printf("Incorreto!");
 }
 
 #endif // FUNCTIONS_H_INCLUDED

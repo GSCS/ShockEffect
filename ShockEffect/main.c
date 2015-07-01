@@ -72,15 +72,18 @@ int main()
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
     ALLEGRO_TIMER *timer = NULL;
+    ALLEGRO_BITMAP *reprovado = NULL;
     ALLEGRO_SAMPLE *musica = NULL;
     ALLEGRO_SAMPLE *musica2 = NULL;
     ALLEGRO_SAMPLE *musica3 = NULL;
     ALLEGRO_SAMPLE *musica4 = NULL;
     ALLEGRO_SAMPLE *musica5 = NULL;
     ALLEGRO_SAMPLE *musica6 = NULL;
+    ALLEGRO_SAMPLE *musica7 = NULL;
+    ALLEGRO_SAMPLE *musica666 = NULL;
     ALLEGRO_SAMPLE_ID musica3id;
     ALLEGRO_SAMPLE_ID musica6id;
-
+    ALLEGRO_SAMPLE_ID musica666id;
     ALLEGRO_FONT *title_font = NULL;
     ALLEGRO_FONT *medium_font = NULL;
 
@@ -122,6 +125,7 @@ int main()
 
     al_draw_text(title_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.1, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
     al_draw_text(title_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.3, ALLEGRO_ALIGN_CENTRE, "LOADING...");
+    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.5, ALLEGRO_ALIGN_CENTRE, "99%");
     al_flip_display();
 
     al_install_keyboard();
@@ -131,6 +135,8 @@ int main()
         printf("Falha ao inicializar image addon");
         return -1;
     }
+
+    //reprovado = al_load_bitmap("images/reprovado.png");
 
     al_install_audio();
     if(!al_install_audio())
@@ -154,23 +160,35 @@ int main()
     }
 
     //carregamento de musicas
-    musica = al_load_sample("sounds/1/topgearsoundtrack.ogg");
-    musica2 = al_load_sample("sounds/1/lucy.ogg");
+    if(letra == 1)
+        musica = al_load_sample("sounds/topgearsoundtrack.ogg");
 
-    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.5, ALLEGRO_ALIGN_CENTRE, "Mais um pouco...");
+    if(letra == 2)
+        musica6 = al_load_sample("sounds/nirvana.ogg");
+
+    if(letra == 3)
+        musica2 = al_load_sample("sounds/lucy.ogg");
+
+    if(letra == 4)
+        musica3 = al_load_sample("sounds/immigrant.ogg");
+
+    if(letra == 5)
+        musica4 = al_load_sample("sounds/melancholy.ogg");
+
+    if(letra == 6)
+        musica5 = al_load_sample("sounds/qotsa.ogg");
+
+    if(letra == 7)
+        musica7 = al_load_sample("sounds/superman.ogg");
+
+    if(letra == 666)
+        musica666 = al_load_sample("sounds/treefriends.ogg");
+
+    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.5, ALLEGRO_ALIGN_CENTRE, "99%");
     al_flip_display();
 
-    musica3 = al_load_sample("sounds/1/immigrant.ogg");
-    musica4 = al_load_sample("sounds/1/melancholy.ogg");
-
-    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.7, ALLEGRO_ALIGN_CENTRE, "Quase la...");
-    al_flip_display();
-
-    musica5 = al_load_sample("sounds/1/starwars.ogg");
-    musica6 = al_load_sample("sounds/1/nirvana.ogg");
-
-    if(letra == 1 ||
-            letra == 7)
+    //tocar musicas
+    if(letra == 1)
         al_play_sample(musica, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
     if(letra == 2)
         al_play_sample(musica6, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, &musica6id);
@@ -182,9 +200,23 @@ int main()
         al_play_sample(musica4, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
     if(letra == 6)
         al_play_sample(musica5, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+    if(letra == 7)
+        al_play_sample(musica7, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+    if(letra == 666)
+        al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, &musica666id);
 
-    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.9, ALLEGRO_ALIGN_CENTRE, "Deu!");
-    al_flip_display();
+    if(letra != 1 &&
+            letra != 2 &&
+            letra != 3 &&
+            letra != 4 &&
+            letra != 5 &&
+            letra != 6 &&
+            letra != 7 &&
+            letra != 666)
+    {
+        printf("Incorreto!");
+        al_destroy_display(display);
+    }
 
     //ALLEGRO QUEUE
     event_queue = al_create_event_queue();
@@ -192,7 +224,7 @@ int main()
 
     //Inicializacao de objetos
 
-    InitShootQ(shootQ); //funcao que inicializa disparo 1 (capacitor)
+    InitShootQ(shootQ, letra); //funcao que inicializa disparo 1 (capacitor)
     if(!shootQ.bitmap)
     {
         al_destroy_display(display);
@@ -200,7 +232,7 @@ int main()
         return -1;
     }
 
-    InitShootW(shootW); //funcao que inicializa disparo 2 (indutor)
+    InitShootW(shootW, letra); //funcao que inicializa disparo 2 (indutor)
     if(!shootW.bitmap)
     {
         al_destroy_display(display);
@@ -226,8 +258,8 @@ int main()
     }
 
     InitPlayer(player, &text_color); //funcao que "inicia" player
-    InitEnemyRed(enemyred, &NUM_ENEMYRED); //funcao que inicia enemyred
-    InitEnemyBlue(enemyblue, &NUM_ENEMYBLUE); //funcao que inicia enemyblue
+    InitEnemyRed(enemyred, &NUM_ENEMYRED, letra); //funcao que inicia enemyred
+    InitEnemyBlue(enemyblue, &NUM_ENEMYBLUE, letra); //funcao que inicia enemyblue
     InitObstacle(obstacle); //funcao que inicializa obstaculos
     InitBoss(boss, &NUM_BOSS, letra); //funcao que inicializa chefes (bosses)
     InitBackground(background, letra); //funcao que inicializa sprite de background
@@ -245,6 +277,9 @@ int main()
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     al_start_timer(timer);
+
+    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.9, ALLEGRO_ALIGN_CENTRE, "Deu!");
+    al_flip_display();
 
     //Loop do jogo
     while (!done)
@@ -280,7 +315,7 @@ int main()
             PlayerLeft(player, &keys[LEFT]);
             PlayerSample(player, letra, &musica3id, musica3);
             TransportPlayer(player);
-            BossSample(boss, &NUM_BOSS, letra, &musica6id, musica6);
+            BossSample(boss, &NUM_BOSS, letra, &musica6id, musica6, &musica666id, musica666);
 
             //updates
             UpdateShootQ(shootQ, player);
@@ -380,8 +415,8 @@ int main()
             DrawBackground5(background5, letra);
             DrawBackground6(background6, letra);
             DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss, obstacle);
-            DrawShootQ(shootQ);
-            DrawShootW(shootW);
+            DrawShootQ(shootQ, letra, boss);
+            DrawShootW(shootW, letra, boss);
             DrawShootE(shootE, player);
             DrawEnemyRed(enemyred, &NUM_ENEMYRED, player, enemyred_sprite);
             DrawEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player);
@@ -408,15 +443,24 @@ int main()
     al_destroy_sample(musica4);
     al_destroy_sample(musica5);
     al_destroy_sample(musica6);
+    al_destroy_sample(musica7);
+    al_destroy_sample(musica666);
     al_destroy_sample(player.sample[0]);
     al_destroy_sample(player.sample[1]);
     al_destroy_sample(player.sample[2]);
     al_destroy_sample(player.sample[3]);
     al_destroy_sample(player.sample[4]);
     al_destroy_bitmap(scientist.bitmap);
-    al_destroy_bitmap(shootE.bitmap);
-    al_destroy_bitmap(shootQ.bitmap);
-    al_destroy_bitmap(shootW.bitmap);
+    al_destroy_bitmap(shootE.bitmap[0]);
+    al_destroy_bitmap(shootQ.bitmap[0]);
+    al_destroy_bitmap(shootQ.bitmap[1]);
+    al_destroy_bitmap(shootQ.bitmap[2]);
+    al_destroy_bitmap(shootW.bitmap[0]);
+    for(b=0; b< NUM_BOSS; b++)
+    {
+        al_destroy_bitmap(boss[b].image);
+    }
+
     for(b=0; b<NUM_ENEMYRED; b++)
     {
         al_destroy_bitmap(enemyred[b].image);

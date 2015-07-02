@@ -9,7 +9,12 @@ void DrawScientist(Player &player, SpriteScientist &scientist, bool *LEFT, bool 
 void PlayerJump(Player &player, bool *UP);
 void PlayerRight(Player &player, bool *RIGHT, struct SpriteScientist &scientist);
 void PlayerLeft(Player &player, bool *LEFT);
-void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_blue enemyblue[], int *num_enemyblue, Obstacle &obstacle, Boss boss[], int *num_boss, int *text_color, ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id, int letra);
+void ResetPlayer(bool over, Player &player, Enemy_red enemyred[], int *num_enemyred,
+                 Enemy_blue enemyblue[], int *num_enemyblue, Obstacle &obstacle,
+                 Boss boss[], int *num_boss, int *text_color,
+                 ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id,
+                 ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id,
+                 int letra);
 void TransportPlayer(Player &player);
 
 //Funções shootQ
@@ -48,7 +53,7 @@ void PlayerColisionEnemyBlue(struct Player &player, struct Enemy_blue enemyblue[
 void InitBoss(struct Boss boss[], int *num_boss, int letra);
 void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player);
 void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_red, struct Enemy_blue enemyblue[], int *num_blue, int letra);
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666);
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666);
 void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss);
 void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss boss[], int *num_boss, struct Player &player);
 
@@ -64,20 +69,20 @@ void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &playe
 
 //funcoes para background
 void OpcaoBackground(int &letra);
-void InitBackground(struct Sprite &background, int letra);
-void DrawBackground(struct Sprite &background, int letra);
-void InitBackground1(struct Sprite &background1, int letra);
-void DrawBackground1(struct Sprite &background1, int letra);
-void InitBackground2(struct Sprite &background2, int letra);
-void DrawBackground2(struct Sprite &background2, int letra);
-void InitBackground3(struct Sprite &background3, int letra);
-void DrawBackground3(struct Sprite &background3, int letra);
-void InitBackground4(struct Sprite &background4, int letra);
-void DrawBackground4(struct Sprite &background4, int letra);
-void InitBackground5(struct Sprite &background5, int letra);
-void DrawBackground5(struct Sprite &background5, int letra);
-void InitBackground6(struct Sprite &background6, int letra);
-void DrawBackground6(struct Sprite &background6, int letra);
+void InitBackground0(struct Sprite &background0, ALLEGRO_SAMPLE *musica0, ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id, int letra);
+void DrawBackground0(struct Sprite &background0);
+void InitBackground1(struct Sprite &background1, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica1id);
+void DrawBackground1(struct Sprite &background1);
+void InitBackground2(struct Sprite &background2, ALLEGRO_SAMPLE *musica2);
+void DrawBackground2(struct Sprite &background2);
+void InitBackground3(struct Sprite &background3, ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id);
+void DrawBackground3(struct Sprite &background3);
+void InitBackground4(struct Sprite &background4, ALLEGRO_SAMPLE *musica4);
+void DrawBackground4(struct Sprite &background4);
+void InitBackground5(struct Sprite &background5, ALLEGRO_SAMPLE *musica5);
+void DrawBackground5(struct Sprite &background5);
+void InitBackground6(struct Sprite &background6, ALLEGRO_SAMPLE *musica0);
+void DrawBackground6(struct Sprite &background6);
 void InitEnemyredSprite(struct Sprite &enemyred_sprite);
 
 #endif // FUNCTIONS_H_INCLUDED

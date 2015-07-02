@@ -17,7 +17,6 @@ struct Player
     bool moving;
     bool colision;
     bool alive;
-    bool inverted;
     bool shield;
     int velx;
     int vely;

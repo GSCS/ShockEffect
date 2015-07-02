@@ -1,7 +1,7 @@
 /*********************************
 *Programação em linguagem C
 *Clarice Ribeiro e Gustavo Simas
-*V1.6.18
+*V3.7.2
 *Titulo: "SHOCK EFFECT"
 *********************************/
 
@@ -28,16 +28,24 @@ const int GRAVITY = 1;
 const int FPS = 60;
 int back_x; //ponto x do fundo do background
 int back_y; //ponto y do fundo do background
-enum KEYS {UP, DOWN, LEFT, RIGHT, Q, W, E, R};
+enum KEYS {ENTER, UP, DOWN, LEFT, RIGHT, Q, W, E};
 bool keys[8] = {false, false, false, false, false, false, false, false};
+const int TELA_INICIO = 0;
+const int TELA_INSTRU = 1;
+const int TELA_JOGO = 2;
+const int TELA_FINAL = 3;
+const int TELA_PAUSE = 4;
 ////////////////////////////////////////////////////////////////////////////////
 
 //main
 int main()
 {
+    int tela = TELA_INICIO;
     int b;
     int letra;
     OpcaoBackground(letra);
+
+    bool over = false;
 
     //primitive variables
     int NUM_ENEMYRED = 10; //quantidade de inimigos vermelhos
@@ -59,7 +67,7 @@ int main()
     struct Shoot shootE;
     struct Obstacle obstacle;
     struct SpriteScientist scientist;
-    struct Sprite background;
+    struct Sprite background0;
     struct Sprite background1;
     struct Sprite background2;
     struct Sprite background3;
@@ -72,18 +80,18 @@ int main()
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
     ALLEGRO_TIMER *timer = NULL;
-    ALLEGRO_BITMAP *reprovado = NULL;
-    ALLEGRO_SAMPLE *musica = NULL;
+    ALLEGRO_SAMPLE *musica0 = NULL;
+    ALLEGRO_SAMPLE *musica1 = NULL;
     ALLEGRO_SAMPLE *musica2 = NULL;
     ALLEGRO_SAMPLE *musica3 = NULL;
     ALLEGRO_SAMPLE *musica4 = NULL;
     ALLEGRO_SAMPLE *musica5 = NULL;
     ALLEGRO_SAMPLE *musica6 = NULL;
-    ALLEGRO_SAMPLE *musica7 = NULL;
     ALLEGRO_SAMPLE *musica666 = NULL;
     ALLEGRO_SAMPLE_ID musica3id;
-    ALLEGRO_SAMPLE_ID musica6id;
+    ALLEGRO_SAMPLE_ID musica1id;
     ALLEGRO_SAMPLE_ID musica666id;
+
     ALLEGRO_FONT *title_font = NULL;
     ALLEGRO_FONT *medium_font = NULL;
 
@@ -136,8 +144,6 @@ int main()
         return -1;
     }
 
-    //reprovado = al_load_bitmap("images/reprovado.png");
-
     al_install_audio();
     if(!al_install_audio())
     {
@@ -157,65 +163,6 @@ int main()
     {
         printf("Falha ao reservar samples");
         return -1;
-    }
-
-    //carregamento de musicas
-    if(letra == 1)
-        musica = al_load_sample("sounds/topgearsoundtrack.ogg");
-
-    if(letra == 2)
-        musica6 = al_load_sample("sounds/nirvana.ogg");
-
-    if(letra == 3)
-        musica2 = al_load_sample("sounds/lucy.ogg");
-
-    if(letra == 4)
-        musica3 = al_load_sample("sounds/immigrant.ogg");
-
-    if(letra == 5)
-        musica4 = al_load_sample("sounds/melancholy.ogg");
-
-    if(letra == 6)
-        musica5 = al_load_sample("sounds/qotsa.ogg");
-
-    if(letra == 7)
-        musica7 = al_load_sample("sounds/superman.ogg");
-
-    if(letra == 666)
-        musica666 = al_load_sample("sounds/treefriends.ogg");
-
-    al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.5, ALLEGRO_ALIGN_CENTRE, "99%");
-    al_flip_display();
-
-    //tocar musicas
-    if(letra == 1)
-        al_play_sample(musica, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-    if(letra == 2)
-        al_play_sample(musica6, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, &musica6id);
-    if(letra == 3)
-        al_play_sample(musica2, 1.5, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-    if(letra == 4)
-        al_play_sample(musica3, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, &musica3id);
-    if(letra == 5)
-        al_play_sample(musica4, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-    if(letra == 6)
-        al_play_sample(musica5, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-    if(letra == 7)
-        al_play_sample(musica7, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-    if(letra == 666)
-        al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, &musica666id);
-
-    if(letra != 1 &&
-            letra != 2 &&
-            letra != 3 &&
-            letra != 4 &&
-            letra != 5 &&
-            letra != 6 &&
-            letra != 7 &&
-            letra != 666)
-    {
-        printf("Incorreto!");
-        al_destroy_display(display);
     }
 
     //ALLEGRO QUEUE
@@ -262,15 +209,35 @@ int main()
     InitEnemyBlue(enemyblue, &NUM_ENEMYBLUE, letra); //funcao que inicia enemyblue
     InitObstacle(obstacle); //funcao que inicializa obstaculos
     InitBoss(boss, &NUM_BOSS, letra); //funcao que inicializa chefes (bosses)
-    InitBackground(background, letra); //funcao que inicializa sprite de background
-    InitBackground1(background1, letra); //funcao que inicializa sprite de background1 alternativo
-    InitBackground2(background2, letra); //funcao que inicializa sprite de background2 alternativo
-    InitBackground3(background3, letra); //funcao que inicializa sprite de background3 alternativo
-    InitBackground4(background4, letra); //funcao que inicializa sprite de background4 alternativo
-    InitBackground5(background5, letra); //funcao que inicializa sprite de background4 alternativo
-    InitBackground6(background6, letra); //funcao que inicializa sprite de background4 alternativo
     InitEnemyredSprite(enemyred_sprite); // funcao que inicializa sprite de inimigo vermelho
+    switch (letra)
+    {
+    case 0:
+        InitBackground0(background0, musica0, musica666, &musica666id, letra);//funcao que inicializa sprite de background0
+        break;
+    case 1:
+        InitBackground1(background1, musica1, &musica1id); //funcao que inicializa sprite de background1 alternativo
+        break;
+    case 2:
+        InitBackground2(background2, musica2); //funcao que inicializa sprite de background2 alternativo
+        break;
+    case 3:
+        InitBackground3(background3, musica3, &musica3id); //funcao que inicializa sprite de background3 alternativo
+        break;
+    case 4:
+        InitBackground4(background4, musica4); //funcao que inicializa sprite de background4 alternativo
+        break;
+    case 5:
+        InitBackground5(background5, musica5); //funcao que inicializa sprite de background5 alternativo
+        break;
+    case 6:
+        InitBackground6(background6, musica6); //funcao que inicializa sprite de background6 alternativo
+        break;
+    case 666:
+        InitBackground0(background0, musica0, musica666, &musica666id, letra);
+    }
 
+    printf("tudo certo");
 
     //ALLEGRO REGISTER
     al_register_event_source(event_queue, al_get_keyboard_event_source());
@@ -285,148 +252,295 @@ int main()
     while (!done)
     {
         ALLEGRO_EVENT ev;
-        al_wait_for_event(event_queue, &ev);
-
-        //se clicar para fechar a janela
-        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        switch(tela)
         {
-            done = true;
-        }
-        //evento do timer (vai entrar nesse else if sempre, a nao ser que feche a janela)
-        else if(ev.type == ALLEGRO_EVENT_TIMER)
-        {
-            redraw = true;
+/////////////////////////////////////////////////////////////////////////////////
+        case TELA_INICIO:
 
-            if(keys[RIGHT] && !player.moving)
-            {
-                player.velx = player.speed;
-                player.moving = true;
-            }
-
-            if(keys[LEFT] && !player.moving)
-            {
-                player.velx = player.speed;
-                player.moving = true;
-            }
-
-            ChangeColor(&text_color, player, boss, &NUM_BOSS, &text_boss);
-            PlayerJump(player, &keys[UP]);
-            PlayerRight(player, &keys[RIGHT], scientist);
-            PlayerLeft(player, &keys[LEFT]);
-            PlayerSample(player, letra, &musica3id, musica3);
-            TransportPlayer(player);
-            BossSample(boss, &NUM_BOSS, letra, &musica6id, musica6, &musica666id, musica666);
-
-            //updates
-            UpdateShootQ(shootQ, player);
-            UpdateShootW(shootW, player);
-            UpdateShootE(shootE, player);
-            UpdateEnemyRed(enemyred, &NUM_ENEMYRED, player, shootQ);
-            UpdateEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player, shootW);
-            UpdateObstacle(obstacle, medium_font, player);
-            UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE, letra);
-
-            //colisoes
-            ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);
-            ShootWColisionEnemyBlue(shootW, enemyblue, &NUM_ENEMYBLUE, player);
-            ShootColisionBoss(shootW, shootQ, boss, &NUM_BOSS, player);
-            PlayerColisionEnemyBlue(player, enemyblue, &NUM_ENEMYBLUE);
-            PlayerColisionEnemyRed(player, enemyred, &NUM_ENEMYRED);
-            PlayerColisionObstacle(player,obstacle);
-            PlayerColisionBoss(player, boss, &NUM_BOSS);
-
-            ResetPlayer(player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE, obstacle, boss, &NUM_BOSS, &text_color, musica3, &musica3id, letra);
-        }
-
-        else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-        {
-            switch(ev.keyboard.keycode)
-            {
-            case ALLEGRO_KEY_ESCAPE:
+            al_wait_for_event(event_queue, &ev);
+            if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 done = true;
-                break;
-            case ALLEGRO_KEY_UP:
-                keys[UP] = true;
-                break;
-            case ALLEGRO_KEY_RIGHT:
-                keys[RIGHT] = true;
-                break;
-            case ALLEGRO_KEY_LEFT:
-                keys[LEFT] = true;
-                break;
-            case ALLEGRO_KEY_Q:
-                keys[Q] = true;
-                FireShootQ(shootQ, player);
-                break;
-            case ALLEGRO_KEY_W:
-                keys[W] = true;
-                FireShootW(shootW, player);
-                break;
-            case ALLEGRO_KEY_E:
-                keys[E] = true;
-                FireShootE(shootE, player);
-                break;
-            case ALLEGRO_KEY_R:
-                keys[R] = true;
-                break;
-            }
-        }
 
-        else if(ev.type == ALLEGRO_EVENT_KEY_UP)
-        {
-            switch(ev.keyboard.keycode)
+            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
             {
-            case ALLEGRO_KEY_UP:
-                keys[UP] = false;
+                if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                    tela = TELA_INSTRU;
+            }
+            switch(letra)
+            {
+            case 0:
+                al_draw_bitmap(background0.image[12], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_RIGHT:
-                keys[RIGHT] = false;
-                player.moving = false;
+            case 1:
+                al_draw_bitmap(background1.image[11], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_LEFT:
-                keys[LEFT] = false;
-                player.moving = false;
+            case 2:
+                al_draw_bitmap(background2.image[12], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_Q:
-                keys[Q] = false;
+            case 3:
+                al_draw_bitmap(background3.image[11], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_W:
-                keys[W] = false;
+            case 4:
+                al_draw_bitmap(background4.image[11], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_E:
-                keys[E] = false;
+            case 5:
+                al_draw_bitmap(background5.image[20], 0, 0, 0);
                 break;
-            case ALLEGRO_KEY_R:
-                keys[R] = false;
+            case 6:
+                al_draw_bitmap(background6.image[21], 0, 0, 0);
+                break;
+            case 666:
+                al_draw_bitmap(background0.image[12], 0, 0, 0);
                 break;
             }
-        }
-
-        if(redraw && al_is_event_queue_empty(event_queue))
-        {
-            redraw = false;
-
-            //desenhar objetos
-            DrawBackground(background, letra);
-            DrawBackground1(background1, letra);
-            DrawBackground2(background2, letra);
-            DrawBackground3(background3, letra);
-            DrawBackground4(background4, letra);
-            DrawBackground5(background5, letra);
-            DrawBackground6(background6, letra);
-            DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss, obstacle);
-            DrawShootQ(shootQ, letra, boss);
-            DrawShootW(shootW, letra, boss);
-            DrawShootE(shootE, player);
-            DrawEnemyRed(enemyred, &NUM_ENEMYRED, player, enemyred_sprite);
-            DrawEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player);
-            DrawBoss(boss, &NUM_BOSS, player);
-            DrawObstacle(obstacle);
-            DrawScientist(player, scientist, &keys[LEFT], &keys[RIGHT]);
 
             al_flip_display();
-        }
-    }
+            break;
+//////////////////////////////////////////////////////////////////////////////////////
+        case TELA_INSTRU:
+
+            al_wait_for_event(event_queue, &ev);
+            if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+                done = true;
+
+            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+            {
+                if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                    tela = TELA_JOGO;
+            }
+
+            if(letra == 0 || letra == 666)
+                al_draw_bitmap(background0.image[13], 0, 0, 0);
+            else
+                al_clear_to_color(al_map_rgb(0, 255, 0));
+            al_flip_display();
+            break;
+
+//////////////////////////////////////////////////////////////////////////////////
+        case TELA_JOGO:
+
+            al_wait_for_event(event_queue, &ev);
+
+            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+            {
+                if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                {
+                    tela = TELA_FINAL;
+                    over = false;
+                    break;
+                }
+            }
+
+            if(over == true)
+            {
+                tela = TELA_FINAL;
+                over = false;
+                break;
+            }
+
+            //se clicar para fechar a janela
+            if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+                done = true;
+
+            //evento do timer (vai entrar nesse else if sempre, a nao ser que feche a janela)
+            else if(ev.type == ALLEGRO_EVENT_TIMER)
+            {
+                redraw = true;
+
+                if(keys[RIGHT] && !player.moving)
+                {
+                    player.velx = player.speed;
+                    player.moving = true;
+                }
+
+                if(keys[LEFT] && !player.moving)
+                {
+                    player.velx = player.speed;
+                    player.moving = true;
+                }
+
+                ChangeColor(&text_color, player, boss, &NUM_BOSS, &text_boss);
+                PlayerJump(player, &keys[UP]);
+                PlayerRight(player, &keys[RIGHT], scientist);
+                PlayerLeft(player, &keys[LEFT]);
+                PlayerSample(player, letra, &musica3id, musica3);
+                BossSample(boss, &NUM_BOSS, letra, &musica1id, musica1, &musica666id, musica666);
+
+                //updates
+                UpdateShootQ(shootQ, player);
+                UpdateShootW(shootW, player);
+                UpdateShootE(shootE, player);
+                UpdateEnemyRed(enemyred, &NUM_ENEMYRED, player, shootQ);
+                UpdateEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player, shootW);
+                UpdateObstacle(obstacle, medium_font, player);
+                UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE, letra);
+
+                //colisoes
+                ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);
+                ShootWColisionEnemyBlue(shootW, enemyblue, &NUM_ENEMYBLUE, player);
+                ShootColisionBoss(shootW, shootQ, boss, &NUM_BOSS, player);
+                PlayerColisionEnemyBlue(player, enemyblue, &NUM_ENEMYBLUE);
+                PlayerColisionEnemyRed(player, enemyred, &NUM_ENEMYRED);
+                PlayerColisionObstacle(player,obstacle);
+                PlayerColisionBoss(player, boss, &NUM_BOSS);
+
+                ResetPlayer(over, player, enemyred, &NUM_ENEMYRED,
+                            enemyblue, &NUM_ENEMYBLUE, obstacle,
+                            boss, &NUM_BOSS, &text_color,
+                            musica3, &musica3id,
+                            musica666, &musica666id, letra);
+            }
+
+            else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+            {
+                switch(ev.keyboard.keycode)
+                {
+                case ALLEGRO_KEY_ESCAPE:
+                    done = true;
+                    break;
+                case ALLEGRO_KEY_UP:
+                    keys[UP] = true;
+                    break;
+                case ALLEGRO_KEY_RIGHT:
+                    keys[RIGHT] = true;
+                    break;
+                case ALLEGRO_KEY_LEFT:
+                    keys[LEFT] = true;
+                    break;
+                case ALLEGRO_KEY_Q:
+                    keys[Q] = true;
+                    FireShootQ(shootQ, player);
+                    break;
+                case ALLEGRO_KEY_W:
+                    keys[W] = true;
+                    FireShootW(shootW, player);
+                    break;
+                case ALLEGRO_KEY_E:
+                    keys[E] = true;
+                    FireShootE(shootE, player);
+                    break;
+                }
+            }
+
+            else if(ev.type == ALLEGRO_EVENT_KEY_UP)
+            {
+                switch(ev.keyboard.keycode)
+                {
+                case ALLEGRO_KEY_UP:
+                    keys[UP] = false;
+                    break;
+                case ALLEGRO_KEY_RIGHT:
+                    keys[RIGHT] = false;
+                    player.moving = false;
+                    break;
+                case ALLEGRO_KEY_LEFT:
+                    keys[LEFT] = false;
+                    player.moving = false;
+                    break;
+                case ALLEGRO_KEY_Q:
+                    keys[Q] = false;
+                    break;
+                case ALLEGRO_KEY_W:
+                    keys[W] = false;
+                    break;
+                case ALLEGRO_KEY_E:
+                    keys[E] = false;
+                    break;
+                }
+            }
+
+            if(redraw && al_is_event_queue_empty(event_queue))
+            {
+                redraw = false;
+
+                //desenhar objetos
+                switch (letra)
+                {
+                case 0:
+                    DrawBackground0(background0);
+                    break;
+                case 1:
+                    DrawBackground1(background1);
+                    break;
+                case 2:
+                    DrawBackground2(background2);
+                    break;
+                case 3:
+                    DrawBackground3(background3);
+                    break;
+                case 4:
+                    DrawBackground4(background4);
+                    break;
+                case 5:
+                    DrawBackground5(background5);
+                    break;
+                case 6:
+                    DrawBackground6(background6);
+                    break;
+                case 666:
+                    DrawBackground0(background0);
+                    break;
+                }
+
+                DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss, obstacle);
+                DrawShootQ(shootQ, letra, boss);
+                DrawShootW(shootW, letra, boss);
+                DrawShootE(shootE, player);
+                DrawEnemyRed(enemyred, &NUM_ENEMYRED, player, enemyred_sprite);
+                DrawEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player);
+                DrawBoss(boss, &NUM_BOSS, player);
+                DrawObstacle(obstacle);
+                DrawScientist(player, scientist, &keys[LEFT], &keys[RIGHT]);
+
+                al_flip_display();
+            }
+            break;
+//////////////////////////////////////////////////////////////////////////////////////
+        case TELA_FINAL:
+
+            al_wait_for_event(event_queue, &ev);
+            if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+                done = true;
+
+            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
+            {
+                if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                    tela = TELA_INICIO;
+            }
+            switch(letra)
+            {
+
+            case 0:
+                al_draw_bitmap(background0.image[14], 0, 0, 0);
+                break;
+            case 1:
+                al_draw_bitmap(background1.image[13], 0, 0, 0);
+                break;
+            case 2:
+                al_draw_bitmap(background2.image[14], 0, 0, 0);
+                break;
+            case 3:
+                al_draw_bitmap(background3.image[13], 0, 0, 0);
+                break;
+            case 4:
+                al_draw_bitmap(background4.image[13], 0, 0, 0);
+                break;
+            case 5:
+                al_draw_bitmap(background5.image[22], 0, 0, 0);
+                break;
+            case 6:
+                al_draw_bitmap(background6.image[23], 0, 0, 0);
+                break;
+            case 666:
+                al_draw_bitmap(background0.image[15], 0, 0, 0);
+                break;
+            }
+
+            al_flip_display();
+
+            break;
+        } //final do switch
+    } //final do while
 
     //destroi coisas
 
@@ -437,14 +551,6 @@ int main()
     al_destroy_display(display);
     al_destroy_sample(shootQ.sample);
     al_destroy_sample(shootW.sample);
-    al_destroy_sample(musica);
-    al_destroy_sample(musica2);
-    al_destroy_sample(musica3);
-    al_destroy_sample(musica4);
-    al_destroy_sample(musica5);
-    al_destroy_sample(musica6);
-    al_destroy_sample(musica7);
-    al_destroy_sample(musica666);
     al_destroy_sample(player.sample[0]);
     al_destroy_sample(player.sample[1]);
     al_destroy_sample(player.sample[2]);
@@ -456,49 +562,55 @@ int main()
     al_destroy_bitmap(shootQ.bitmap[1]);
     al_destroy_bitmap(shootQ.bitmap[2]);
     al_destroy_bitmap(shootW.bitmap[0]);
-    for(b=0; b< NUM_BOSS; b++)
-    {
-        al_destroy_bitmap(boss[b].image);
-    }
-
     for(b=0; b<NUM_ENEMYRED; b++)
-    {
         al_destroy_bitmap(enemyred[b].image);
-    }
     for(b=0; b<NUM_ENEMYBLUE; b++)
-    {
         al_destroy_bitmap(enemyblue[b].image);
-    }
-    for(b=0; b<background.frame_max; b++)
+
+    switch(letra)
     {
-        al_destroy_bitmap(background.image[b]);
-    }
-    for(b=0; b<background1.frame_max; b++)
-    {
-        al_destroy_bitmap(background1.image[b]);
-    }
-    for(b=0; b<background2.frame_max; b++)
-    {
-        al_destroy_bitmap(background2.image[b]);
-    }
-    for(b=0; b<background3.frame_max; b++)
-    {
-        al_destroy_bitmap(background3.image[b]);
-    }
-    for(b=0; b<background4.frame_max; b++)
-    {
-        al_destroy_bitmap(background4.image[b]);
-    }
-    for(b=0; b<background5.frame_max; b++)
-    {
-        al_destroy_bitmap(background5.image[b]);
-    }
-    for(b=0; b<background6.frame_max; b++)
-    {
-        al_destroy_bitmap(background6.image[b]);
+    case 0:
+        al_destroy_sample(musica0);
+
+        for(b=0; b<background0.frame_max + 3; b++)
+            al_destroy_bitmap(background0.image[b]);
+        break;
+    case 1:
+        al_destroy_sample(musica1);
+        for(b=0; b<background1.frame_max + 2; b++)
+            al_destroy_bitmap(background1.image[b]);
+        break;
+    case 2:
+        al_destroy_sample(musica2);
+        for(b=0; b<background2.frame_max + 2; b++)
+            al_destroy_bitmap(background2.image[b]);
+        break;
+    case 3:
+        al_destroy_sample(musica3);
+        for(b=0; b<background3.frame_max + 2; b++)
+            al_destroy_bitmap(background3.image[b]);
+        break;
+    case 4:
+        al_destroy_sample(musica4);
+        for(b=0; b<background4.frame_max + 2; b++)
+            al_destroy_bitmap(background4.image[b]);
+        break;
+    case 5:
+        al_destroy_sample(musica5);
+        for(b=0; b<background5.frame_max + 2; b++)
+            al_destroy_bitmap(background5.image[b]);
+        break;
+    case 6:
+        al_destroy_sample(musica6);
+        for(b=0; b<background6.frame_max + 2; b++)
+            al_destroy_bitmap(background6.image[b]);
+        break;
+    case 666:
+        al_destroy_sample(musica666);
+        for(b=0; b<background0.frame_max + 2; b++)
+            al_destroy_bitmap(background0.image[b]);
     }
 
     return 0;
-}
 
-//final da MAIN!!
+}//final da MAIN!!

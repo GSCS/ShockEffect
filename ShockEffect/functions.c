@@ -23,6 +23,12 @@ extern const int FPS = 60;
 extern int back_x;
 extern int back_y;
 
+extern const int TELA_INICIO = 0;
+extern const int TELA_ISNTRU = 1;
+extern const int TELA_JOGO = 2;
+extern const int TELA_FINAL = 3;
+
+
 
 //funcao para iniciar jogador
 void InitPlayer(Player &player, int *text_color)
@@ -37,7 +43,6 @@ void InitPlayer(Player &player, int *text_color)
     player.moving = false;
     player.colision = false;
     player.alive = true;
-    player.inverted = false;
     player.shield = false;
     player.velx = 0;
     player.vely = 1;
@@ -149,57 +154,27 @@ void DrawScientist(Player &player, SpriteScientist &scientist, bool *LEFT, bool 
 void PlayerJump(struct Player &player, bool *UP)
 {
     bool vely_max = false;
-    //pulo nao invertido
-    if(!player.inverted)
+    if(player.vely <= player.jumpSpeed && !player.jump && *UP)
     {
-        if(player.vely <= player.jumpSpeed && !player.jump && *UP)
-        {
-            player.vely = player.jumpSpeed;
-            player.jump = true;
-        }
-        if(player.jump && !vely_max)
-        {
-            player.vely -= GRAVITY;
-            player.y -= player.vely;
-        }
-        if(player.jump && player.vely == 0)
-            vely_max = true;
-        if(player.jump && vely_max && player.y < HEIGHT)
-        {
-            player.y += player.vely;
-        }
-        if(player.y == HEIGHT)
-        {
-            player.vely = 15;
-            player.jump = false;
-            vely_max = false;
-        }
+        player.vely = player.jumpSpeed;
+        player.jump = true;
     }
-    //pulo invertido
-    if(player.inverted)
+    if(player.jump && !vely_max)
     {
-        if(player.vely <= player.jumpSpeed && !player.jump && *UP)
-        {
-            player.vely = player.jumpSpeed;
-            player.jump = true;
-        }
-        if(player.jump && !vely_max)
-        {
-            player.vely -= GRAVITY;
-            player.y += player.vely;
-        }
-        if(player.jump && player.vely == 0)
-            vely_max = true;
-        if(player.jump && vely_max && player.y - player.boundy > 0)
-        {
-            player.y -= player.vely;
-        }
-        if(player.y - player.boundy == 0)
-        {
-            player.vely = 15;
-            player.jump = false;
-            vely_max = false;
-        }
+        player.vely -= GRAVITY;
+        player.y -= player.vely;
+    }
+    if(player.jump && player.vely == 0)
+        vely_max = true;
+    if(player.jump && vely_max && player.y < HEIGHT)
+    {
+        player.y += player.vely;
+    }
+    if(player.y == HEIGHT)
+    {
+        player.vely = 15;
+        player.jump = false;
+        vely_max = false;
     }
 }
 
@@ -223,13 +198,19 @@ void PlayerLeft(struct Player &player, bool *LEFT)
 }
 
 //funcao para reiniciar jogador e inimigos
-void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_blue enemyblue[], int *num_enemyblue, Obstacle &obstacle, Boss boss[], int *num_boss, int *text_color, ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id, int letra)
+void ResetPlayer(bool over, Player &player, Enemy_red enemyred[],
+    int *num_enemyred, Enemy_blue enemyblue[], int *num_enemyblue,
+    Obstacle &obstacle, Boss boss[], int *num_boss, int *text_color,
+    ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id,
+    ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id,
+    int letra)
 {
     int j;
     if(player.lives <= 0)
     {
         player.alive = false;
         al_play_sample(player.sample[0], 0.8, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+        over = true;
     }
     if(player.alive == false)
     {
@@ -242,7 +223,6 @@ void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_
         player.moving = false;
         player.colision = false;
         player.alive = true;
-        player.inverted = false;
         player.shield = false;
         player.velx = 0;
         player.vely = 1;
@@ -279,48 +259,13 @@ void ResetPlayer(Player &player, Enemy_red enemyred[], int *num_enemyred, Enemy_
             boss[j].alive = false;
             boss[j].lived = false;
             boss[j].instance_played = false;
+            al_stop_sample_instance(boss[j].instance[2]);
         }
+        al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica666id);
         obstacle.score = 5;
     }
 }
 
-//funcao para teleportar player (inverter)
-void TransportPlayer(struct Player &player)
-{
-    if(!player.inverted && !player.jump)
-    {
-        if(player.x < -150)
-        {
-            player.y = player.boundy;
-            player.x = WIDTH - player.boundx/2;
-            player.inverted = true;
-            player.death_counter = 0;
-        }
-        if(player.x > WIDTH + 150)
-        {
-            player.y = player.boundy;
-            player.x = -(player.boundx/2);
-            player.inverted = true;
-            player.death_counter = 0;
-        }
-    }
-    if(player.inverted && !player.jump)
-    {
-        if(player.x < -150)
-        {
-            player.y = HEIGHT;
-            player.x = WIDTH - player.boundx/2;
-            player.inverted = false;
-            player.death_counter = 0;
-        }
-        if(player.x > WIDTH + 150)
-        {
-            player.y = HEIGHT;
-            player.x = -(player.boundx/2);
-            player.inverted = false;
-        }
-    }
-}
 
 //funcoes poder indutor "Q"//////////////////////////////////////////////////
 //funcao para iniciar tiro Q
@@ -369,21 +314,12 @@ void FireShootQ(struct Shoot &shootQ, struct Player &player)
 {
     if (!(shootQ.live))
     {
-        if(!player.inverted)
-        {
-            shootQ.x = (player.x);
-            shootQ.y = (player.y) - 70;
-            shootQ.width = 40;
-            shootQ.height = 40;
-            shootQ.live = true;
-            al_play_sample(shootQ.sample, 0.7, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-        }
-        if(player.inverted)
-        {
-            shootQ.x = (player.x) + 20;
-            shootQ.y = (player.y) + 20;
-            shootQ.live = true;
-        }
+        shootQ.x = (player.x);
+        shootQ.y = (player.y) - 70;
+        shootQ.width = 40;
+        shootQ.height = 40;
+        shootQ.live = true;
+        al_play_sample(shootQ.sample, 0.7, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
 }
 
@@ -399,13 +335,9 @@ void UpdateShootQ(struct Shoot &shootQ, struct Player &player)
         shootQ.boundx = shootQ.width;
         shootQ.boundy = shootQ.height;
         if(shootQ.x > back_x)
-        {
             shootQ.x -=shootQ.speed;
-        }
         if(shootQ.x < back_x)
-        {
             shootQ.x +=shootQ.speed;
-        }
         if (shootQ.y < back_y)
         {
             shootQ.live = false;
@@ -434,27 +366,26 @@ void InitShootW(struct Shoot &shootW, int letra)
 
 //funcao para desenhar tiro W
 void DrawShootW(struct Shoot &shootW, int letra, struct Boss boss[])
+{if(shootW.live)
 {
-    if(shootW.live)
+    if(letra != 666)
+        al_draw_scaled_bitmap(shootW.bitmap[0], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+    if(letra == 666)
     {
-        if(letra != 666)
-            al_draw_scaled_bitmap(shootW.bitmap[0], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
-        if(letra == 666)
-        {
-            if(!boss[0].alive &&
-                    !boss[1].alive &&
-                    !boss[2].alive &&
-                    !boss[3].alive &&
-                    !boss[4].alive)
-                al_draw_scaled_bitmap(shootW.bitmap[1], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
-            if(boss[0].alive ||
-                    boss[1].alive ||
-                    boss[2].alive ||
-                    boss[3].alive ||
-                    boss[4].alive)
-                al_draw_scaled_bitmap(shootW.bitmap[2], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
-        }
+        if(!boss[0].alive &&
+                !boss[1].alive &&
+                !boss[2].alive &&
+                !boss[3].alive &&
+                !boss[4].alive)
+            al_draw_scaled_bitmap(shootW.bitmap[1], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
+        if(boss[0].alive ||
+                boss[1].alive ||
+                boss[2].alive ||
+                boss[3].alive ||
+                boss[4].alive)
+            al_draw_scaled_bitmap(shootW.bitmap[2], 0, 0, 30, 30, shootW.x, shootW.y, shootW.width, shootW.height, 0);
     }
+}
 }
 
 //funcao para disparar tiro W
@@ -462,21 +393,12 @@ void FireShootW(struct Shoot &shootW, struct Player &player)
 {
     if (!shootW.live)
     {
-        if(!player.inverted)
-        {
-            shootW.x = (player.x) + 30;
-            shootW.y = (player.y) - 70;
-            shootW.live = true;
-            shootW.width = 50;
-            shootW.height = 50;
-            al_play_sample(shootW.sample, 0.7, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-        }
-        if(player.inverted)
-        {
-            shootW.x = (player.x) + 20;
-            shootW.y = (player.y) + 20;
-            shootW.live = true;
-        }
+        shootW.x = (player.x) + 30;
+        shootW.y = (player.y) - 70;
+        shootW.live = true;
+        shootW.width = 50;
+        shootW.height = 50;
+        al_play_sample(shootW.sample, 0.7, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
     }
 }
 
@@ -523,7 +445,7 @@ void DrawShootE(Shoot &shootE, Player &player)
     if (shootE.live)
     {
         shootE.x = player.x - player.boundx * 0.9;
-        shootE.y = player.y - 2*player.boundy;
+        shootE.y = player.y - 3 * player.boundy;
         al_draw_bitmap(shootE.bitmap[0], shootE.x, shootE.y, 0);
     }
 }
@@ -606,16 +528,12 @@ void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &
                 enemyred_sprite.frame_count = 0;
             }
             al_draw_scaled_bitmap(enemyred[j].image, 0, 0, back_x, back_y, enemyred[j].x, enemyred[j].y, enemyred[j].boundx, enemyred[j].boundy, 0);
-            //al_draw_filled_circle(enemyred[j].x, enemyred[j].y, enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy + 150, 0, 0));
-            //al_draw_filled_rectangle(enemyred[j].x + 20, enemyred[j].y - 10, enemyred[j].x + enemyred[j].size_enemy, enemyred[j].y - enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy+100, enemyred[j].size_enemy, 0));
-            //al_draw_filled_rectangle(enemyred[j].x - 20, enemyred[j].y, enemyred[j].x - enemyred[j].size_enemy, enemyred[j].y + enemyred[j].size_enemy, al_map_rgb(enemyred[j].size_enemy+100, enemyred[j].size_enemy, 0));
         }
         else if(enemyred[j].alive == false)
         {
             enemyred[j].x= back_x;
             enemyred[j].y = back_y;
             enemyred[j].size_enemy = 0;
-            enemyred[j].speed_size = 0;
             enemyred[j].velx = 0;
             enemyred[j].vely = 0;
         }
@@ -712,9 +630,6 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
         if(enemyblue[j].alive && player.score >= 6)
         {
             al_draw_scaled_bitmap(enemyblue[j].image, 0, 0, back_x, back_y, enemyblue[j].x, enemyblue[j].y, enemyblue[j].boundx, enemyblue[j].boundy, 0);
-            //al_draw_filled_circle(enemyblue[j].x, enemyblue[j].y, enemyblue[j].size_enemy, al_map_rgb(0, enemyblue[j].size_enemy * 6, enemyblue[j].size_enemy * 6));
-            //al_draw_filled_rectangle(enemyblue[j].x + 10, enemyblue[j].y - 5, enemyblue[j].x + enemyblue[j].size_enemy, enemyblue[j].y - enemyblue[j].size_enemy, al_map_rgb(50, 0, enemyblue[j].size_enemy + 100));
-            //al_draw_filled_rectangle(enemyblue[j].x - 10, enemyblue[j].y - 5, enemyblue[j].x - enemyblue[j].size_enemy, enemyblue[j].y + enemyblue[j].size_enemy, al_map_rgb(enemyblue[j].size_enemy, 0, enemyblue[j].size_enemy + 100));
         }
         else if(enemyblue[j].alive == false)
         {
@@ -765,10 +680,7 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
             enemyblue[j].size_enemy += enemyblue[j].speed;
             enemyblue[j].velx = enemyblue[j].speedx;
             enemyblue[j].vely = enemyblue[j].speed;
-            if(!player.inverted)
-                enemyblue[j].y += enemyblue[j].vely;
-            if(player.inverted)
-                enemyblue[j].y -= enemyblue[j].vely;
+            enemyblue[j].y += enemyblue[j].vely;
             if(enemyblue[j].x <= back_x)
             {
                 enemyblue[j].x -= enemyblue[j].velx;
@@ -796,6 +708,10 @@ void ShootQColisionEnemyRed(struct Shoot &shootQ, struct Enemy_red enemyred[], i
                     shootQ.y - shootQ.boundy > (enemyred[j].y))
             {
                 enemyred[j].alive = false;
+                enemyred[j].speed = 0.001;
+                enemyred[j].speed_size = 0;
+                enemyred[j].speedx = 0.005;
+                enemyred[j].size_enemy = 0;
                 player.score += 2;
                 shootQ.live = false;
             }
@@ -927,20 +843,8 @@ void UpdateObstacle(Obstacle &obstacle, ALLEGRO_FONT *medium_font, Player &playe
                 obstacle.x-=obstacle.velx;
             if(obstacle.x<player.x)
                 obstacle.x+=obstacle.velx;
-            if(!player.inverted)
-            {
-                obstacle.vely += obstacle.speed;
-                obstacle.y+=obstacle.vely;
-            }
-            if(player.inverted)
-            {
-                obstacle.vely += obstacle.speed;
-                obstacle.y-=obstacle.vely;
-                if(obstacle.y<(50) &&
-                        player.x>=obstacle.x &&
-                        player.x+player.boundx <= obstacle.x+obstacle.size_obst)
-                    al_draw_textf(medium_font, al_map_rgb(255, 0, 0), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTRE, "JUMP!");
-            }
+            obstacle.vely += obstacle.speed;
+            obstacle.y+=obstacle.vely;
         }
     }
     if(obstacle.y>HEIGHT+20 || obstacle.y < -20)
@@ -1031,45 +935,44 @@ void ChangeColor(int *text_color, struct Player &player, struct Boss boss[], int
 
 //funcao para iniciar boss
 void InitBoss(struct Boss boss[], int *num_boss, int letra)
+{int j;
+for(j=0; j < *num_boss; j++)
 {
-    int j;
-    for(j=0; j < *num_boss; j++)
+    boss[j].ID = ENEMY;
+    if(letra != 666)
+        boss[j].image = al_load_bitmap("images/boss_1.png");
+    if(letra == 666)
     {
-        boss[j].ID = ENEMY;
-        if(letra != 666)
-            boss[j].image = al_load_bitmap("images/boss_1.png");
-        if(letra == 666)
-        {
-            boss[j].image = al_load_bitmap("images/mussoi.png");
-            boss[j].sample[2] = al_load_sample("sounds/starwars.ogg");
-            boss[j].instance[2] = al_create_sample_instance(boss[j].sample[2]);
-            al_attach_sample_instance_to_mixer(boss[j].instance[2], al_get_default_mixer());
-        }
-        boss[j].x = back_x;
-        boss[j].y = back_y;
-        boss[j].real_y = boss[j].y;
-        boss[j].speed = 0.1;
-        boss[j].size_boss = 0;
-        boss[j].width = al_get_bitmap_width(boss[j].image);
-        boss[j].height = al_get_bitmap_height(boss[j].image);
-        boss[j].velx = 0.5;
-        boss[j].vely = 15;
-        boss[j].boundx = 0;
-        boss[j].boundy = 0;
-        boss[j].real_size_boss = 100;
-        boss[j].lives = 20;
-        boss[j].alive = false;
-        boss[j].lived = false;
-        boss[j].instance_played = false;
-
-        boss[j].sample[0] = al_load_sample("sounds/songboss.ogg");
-        boss[j].sample[1] = al_load_sample("sounds/songboss2.ogg");
-        boss[j].instance[0] = al_create_sample_instance(boss[j].sample[0]);
-        boss[j].instance[1] = al_create_sample_instance(boss[j].sample[1]);
-        al_attach_sample_instance_to_mixer(boss[j].instance[0], al_get_default_mixer());
-        al_attach_sample_instance_to_mixer(boss[j].instance[1], al_get_default_mixer());
-
+        boss[j].image = al_load_bitmap("images/mussoi.png");
+        boss[j].sample[2] = al_load_sample("sounds/starwars.ogg");
+        boss[j].instance[2] = al_create_sample_instance(boss[j].sample[2]);
+        al_attach_sample_instance_to_mixer(boss[j].instance[2], al_get_default_mixer());
     }
+    boss[j].x = back_x;
+    boss[j].y = back_y;
+    boss[j].real_y = boss[j].y;
+    boss[j].speed = 0.1;
+    boss[j].size_boss = 0;
+    boss[j].width = al_get_bitmap_width(boss[j].image);
+    boss[j].height = al_get_bitmap_height(boss[j].image);
+    boss[j].velx = 0.5;
+    boss[j].vely = 15;
+    boss[j].boundx = 0;
+    boss[j].boundy = 0;
+    boss[j].real_size_boss = 100;
+    boss[j].lives = 20;
+    boss[j].alive = false;
+    boss[j].lived = false;
+    boss[j].instance_played = false;
+
+    boss[j].sample[0] = al_load_sample("sounds/songboss.ogg");
+    boss[j].sample[1] = al_load_sample("sounds/songboss2.ogg");
+    boss[j].instance[0] = al_create_sample_instance(boss[j].sample[0]);
+    boss[j].instance[1] = al_create_sample_instance(boss[j].sample[1]);
+    al_attach_sample_instance_to_mixer(boss[j].instance[0], al_get_default_mixer());
+    al_attach_sample_instance_to_mixer(boss[j].instance[1], al_get_default_mixer());
+
+}
 }
 
 //funcao para desenhar boss
@@ -1081,9 +984,6 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
         if(boss[j].alive)
         {
             al_draw_scaled_bitmap(boss[j].image, 0, 0, back_x, back_y, boss[j].x, boss[j].y, boss[j].boundx, boss[j].boundy, 0);
-            //al_draw_filled_circle(boss[j].x, boss[j].y, boss[j].size_boss, al_map_rgb(255,0,255));
-            //al_draw_filled_rectangle(boss[j].x + 30, boss[j].y - 5, boss[j].x + boss[j].size_boss, boss[j].y - boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, boss[j].size_boss, 0));
-            //al_draw_filled_rectangle(boss[j].x - 40, boss[j].y, boss[j].x - boss[j].size_boss, boss[j].y + boss[j].size_boss, al_map_rgb(boss[j].size_boss + 100, 50, boss[j].size_boss));
         }
     }
 }
@@ -1161,7 +1061,7 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
     }
 }
 
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica6id, ALLEGRO_SAMPLE *musica6, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666)
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666)
 {
     int j;
     for(j=0; j < *num_boss; j++)
@@ -1175,7 +1075,7 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             }
             if(letra == 2)
             {
-                al_stop_sample(musica6id);
+                al_stop_sample(musica1id);
                 al_play_sample_instance(boss[j].instance[1]);
             }
              if(letra == 666)
@@ -1189,7 +1089,7 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             if(letra == 2)
             {
                 al_stop_sample_instance(boss[j].instance[1]);
-                al_play_sample(musica6, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica6id);
+                al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
                 boss[j].instance_played = true;
             }
             if(letra == 666)
@@ -1260,49 +1160,57 @@ void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss b
     }
 }
 
-void InitBackground(struct Sprite &background, int letra)
+void InitBackground0(struct Sprite &background0, ALLEGRO_SAMPLE *musica0, ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id, int letra)
 {
-    if(letra == 1 || letra == 666)
-    {
-        background.frame_atual = 0;
-        background.frame_count = 0;
-        background.frame_delay = 2;
-        background.frame_max = 12;
+        background0.frame_atual = 0;
+        background0.frame_count = 0;
+        background0.frame_delay = 2;
+        background0.frame_max = 12;
 
-        background.image[0] = al_load_bitmap("images/background/back_0.png");
-        background.image[1] = al_load_bitmap("images/background/back_2.png");
-        background.image[2] = al_load_bitmap("images/background/back_4.png");
-        background.image[3] = al_load_bitmap("images/background/back_6.png");
-        background.image[4] = al_load_bitmap("images/background/back_8.png");
-        background.image[5] = al_load_bitmap("images/background/back_10.png");
-        background.image[6] = al_load_bitmap("images/background/back_12.png");
-        background.image[7] = al_load_bitmap("images/background/back_14.png");
-        background.image[8] = al_load_bitmap("images/background/back_16.png");
-        background.image[9] = al_load_bitmap("images/background/back_18.png");
-        background.image[10] = al_load_bitmap("images/background/back_20.png");
-        background.image[11] = al_load_bitmap("images/background/back_22.png");
-    }
+        background0.image[0] = al_load_bitmap("images/background/back_0.png");
+        background0.image[1] = al_load_bitmap("images/background/back_2.png");
+        background0.image[2] = al_load_bitmap("images/background/back_4.png");
+        background0.image[3] = al_load_bitmap("images/background/back_6.png");
+        background0.image[4] = al_load_bitmap("images/background/back_8.png");
+        background0.image[5] = al_load_bitmap("images/background/back_10.png");
+        background0.image[6] = al_load_bitmap("images/background/back_12.png");
+        background0.image[7] = al_load_bitmap("images/background/back_14.png");
+        background0.image[8] = al_load_bitmap("images/background/back_16.png");
+        background0.image[9] = al_load_bitmap("images/background/back_18.png");
+        background0.image[10] = al_load_bitmap("images/background/back_20.png");
+        background0.image[11] = al_load_bitmap("images/background/back_22.png");
+
+        background0.image[12] = al_load_bitmap("images/telas/tela-inicio0.png");
+        background0.image[13] = al_load_bitmap("images/telas/tela-instru0.png");
+        background0.image[14] = al_load_bitmap("images/telas/tela-final0.png");
+        background0.image[15] = al_load_bitmap("images/reprovado.png");
+
+        //carregar musica referente
+        switch (letra) {
+            case 0:
+            musica0 = al_load_sample("sounds/topgearsoundtrack.ogg");
+            al_play_sample(musica0, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+            break;
+            case 666:
+            musica666 = al_load_sample("sounds/treefriends.ogg");
+            al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica666id);
+        }
 }
 
-void DrawBackground(struct Sprite &background, int letra)
+void DrawBackground0(struct Sprite &background0)
 {
-    if(letra == 1 || letra == 666)
-    {
-        if(++background.frame_count >= background.frame_delay)
+        if(++background0.frame_count >= background0.frame_delay)
         {
-            if(++background.frame_atual >= background.frame_max)
-                background.frame_atual = 0;
-            background.frame_count = 0;
+            if(++background0.frame_atual >= background0.frame_max)
+                background0.frame_atual = 0;
+            background0.frame_count = 0;
         }
 
-        al_draw_bitmap(background.image[background.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
+        al_draw_bitmap(background0.image[background0.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
 }
 
-void InitBackground1(struct Sprite &background1, int letra)
+void InitBackground1(struct Sprite &background1, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica1id)
 {
-    if(letra == 2)
-    {
         background1.frame_atual = 0;
         background1.frame_count = 0;
         background1.frame_delay = 5;
@@ -1319,13 +1227,16 @@ void InitBackground1(struct Sprite &background1, int letra)
         background1.image[8] = al_load_bitmap("images/background/back5/back5 (17).png");
         background1.image[9] = al_load_bitmap("images/background/back5/back5 (19).png");
         background1.image[10] = al_load_bitmap("images/background/back5/back5 (21).png");
-    }
+
+        background1.image[11] = al_load_bitmap("images/telas/tela-inicio1.png");
+        background1.image[13] = al_load_bitmap("images/telas/tela-final1.png");
+        //carregar musica referente
+        musica1 = al_load_sample("sounds/nirvana.ogg");
+        al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
 }
 
-void DrawBackground1(struct Sprite &background1, int letra)
+void DrawBackground1(struct Sprite &background1)
 {
-    if(letra == 2)
-    {
         if(++background1.frame_count >= background1.frame_delay)
         {
             if(++background1.frame_atual >= background1.frame_max)
@@ -1334,13 +1245,10 @@ void DrawBackground1(struct Sprite &background1, int letra)
         }
 
         al_draw_bitmap(background1.image[background1.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
-void InitBackground2(struct Sprite &background2, int letra)
+void InitBackground2(struct Sprite &background2, ALLEGRO_SAMPLE *musica2)
 {
-    if(letra == 3)
-    {
         background2.frame_atual = 0;
         background2.frame_count = 0;
         background2.frame_delay = 5;
@@ -1358,13 +1266,16 @@ void InitBackground2(struct Sprite &background2, int letra)
         background2.image[9] = al_load_bitmap("images/background/back2/back2 (19).png");
         background2.image[10] = al_load_bitmap("images/background/back2/back2 (21).png");
         background2.image[11] = al_load_bitmap("images/background/back2/back2 (23).png");
-    }
+
+        background2.image[12] = al_load_bitmap("images/telas/tela-inicio2-3.png");
+        background2.image[14] = al_load_bitmap("images/telas/tela-final2-3.png");
+        //carregar musica referente
+        musica2 = al_load_sample("sounds/lucy.ogg");
+        al_play_sample(musica2, 1.5, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 }
 
-void DrawBackground2(struct Sprite &background2, int letra)
+void DrawBackground2(struct Sprite &background2)
 {
-    if(letra == 3)
-    {
         if(++background2.frame_count >= background2.frame_delay)
         {
             if(++background2.frame_atual >= background2.frame_max)
@@ -1373,13 +1284,10 @@ void DrawBackground2(struct Sprite &background2, int letra)
         }
 
         al_draw_bitmap(background2.image[background2.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
-void InitBackground3(struct Sprite &background3, int letra)
+void InitBackground3(struct Sprite &background3, ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id)
 {
-    if(letra == 4)
-    {
         background3.frame_atual = 0;
         background3.frame_count = 0;
         background3.frame_delay = 5;
@@ -1396,13 +1304,16 @@ void InitBackground3(struct Sprite &background3, int letra)
         background3.image[8] = al_load_bitmap("images/background/back7/back7 (18).png");
         background3.image[9] = al_load_bitmap("images/background/back7/back7 (20).png");
         background3.image[10] = al_load_bitmap("images/background/back7/back7 (22).png");
-    }
+
+        background3.image[11] = al_load_bitmap("images/telas/tela-inicio2-3.png");
+        background3.image[13] = al_load_bitmap("images/telas/tela-final2-3.png");
+        //carregar musica referente
+        musica3 = al_load_sample("sounds/immigrant.ogg");
+        al_play_sample(musica3, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica3id);
 }
 
-void DrawBackground3(struct Sprite &background3, int letra)
+void DrawBackground3(struct Sprite &background3)
 {
-    if(letra == 4)
-    {
         if(++background3.frame_count >= background3.frame_delay)
         {
             if(++background3.frame_atual >= background3.frame_max)
@@ -1411,13 +1322,10 @@ void DrawBackground3(struct Sprite &background3, int letra)
         }
 
         al_draw_bitmap(background3.image[background3.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
-void InitBackground4(struct Sprite &background4, int letra)
+void InitBackground4(struct Sprite &background4, ALLEGRO_SAMPLE *musica4)
 {
-    if(letra == 5)
-    {
         background4.frame_atual = 0;
         background4.frame_count = 0;
         background4.frame_delay = 5;
@@ -1434,13 +1342,16 @@ void InitBackground4(struct Sprite &background4, int letra)
         background4.image[8] = al_load_bitmap("images/background/back8/back8 (17).png");
         background4.image[9] = al_load_bitmap("images/background/back8/back8 (19).png");
         background4.image[10] = al_load_bitmap("images/background/back8/back8 (21).png");
-    }
+
+        background4.image[11] = al_load_bitmap("images/telas/tela-inicio4.png");
+        background4.image[13] = al_load_bitmap("images/telas/tela-final4.png");
+        //carregar musica referente
+        musica4 = al_load_sample("sounds/melancholy.ogg");
+        al_play_sample(musica4, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 }
 
-void DrawBackground4(struct Sprite &background4, int letra)
+void DrawBackground4(struct Sprite &background4)
 {
-    if(letra == 5)
-    {
         if(++background4.frame_count >= background4.frame_delay)
         {
             if(++background4.frame_atual >= background4.frame_max)
@@ -1449,13 +1360,10 @@ void DrawBackground4(struct Sprite &background4, int letra)
         }
 
         al_draw_bitmap(background4.image[background4.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
-void InitBackground5(struct Sprite &background5, int letra)
+void InitBackground5(struct Sprite &background5, ALLEGRO_SAMPLE *musica5)
 {
-    if(letra == 6)
-    {
         background5.frame_atual = 0;
         background5.frame_count = 0;
         background5.frame_delay = 5;
@@ -1481,13 +1389,16 @@ void InitBackground5(struct Sprite &background5, int letra)
         background5.image[17] = al_load_bitmap("images/background/back6/back6 (35).png");
         background5.image[18] = al_load_bitmap("images/background/back6/back6 (37).png");
         background5.image[19] = al_load_bitmap("images/background/back6/back6 (39).png");
-    }
+
+        background5.image[20] = al_load_bitmap("images/telas/tela-inicio5.png");
+        background5.image[22] = al_load_bitmap("images/telas/tela-final5.png");
+        //carregar musica referente
+        musica5 = al_load_sample("sounds/starwars.ogg");
+        al_play_sample(musica5, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 }
 
-void DrawBackground5(struct Sprite &background5, int letra)
+void DrawBackground5(struct Sprite &background5)
 {
-    if(letra == 6)
-    {
         if(++background5.frame_count >= background5.frame_delay)
         {
             if(++background5.frame_atual >= background5.frame_max)
@@ -1496,13 +1407,10 @@ void DrawBackground5(struct Sprite &background5, int letra)
         }
 
         al_draw_bitmap(background5.image[background5.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
-void InitBackground6(struct Sprite &background6, int letra)
+void InitBackground6(struct Sprite &background6, ALLEGRO_SAMPLE *musica6)
 {
-    if(letra == 7)
-    {
         background6.frame_atual = 0;
         background6.frame_count = 0;
         background6.frame_delay = 5;
@@ -1529,13 +1437,16 @@ void InitBackground6(struct Sprite &background6, int letra)
         background6.image[18] = al_load_bitmap("images/background/back9/back9 (90).png");
         background6.image[19] = al_load_bitmap("images/background/back9/back9 (95).png");
         background6.image[20] = al_load_bitmap("images/background/back9/back9 (99).png");
-    }
+
+        background6.image[21] = al_load_bitmap("images/telas/tela-inicio6.png");
+        background6.image[23] = al_load_bitmap("images/telas/tela-final6.png");
+        //carregar musica referente
+        musica6 = al_load_sample("sounds/superman.ogg");
+        al_play_sample(musica6, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 }
 
-void DrawBackground6(struct Sprite &background6, int letra)
+void DrawBackground6(struct Sprite &background6)
 {
-    if(letra == 7)
-    {
         if(++background6.frame_count >= background6.frame_delay)
         {
             if(++background6.frame_atual >= background6.frame_max)
@@ -1544,7 +1455,6 @@ void DrawBackground6(struct Sprite &background6, int letra)
         }
 
         al_draw_bitmap(background6.image[background6.frame_atual], 0, 0, ALLEGRO_ALIGN_CENTRE);
-    }
 }
 
 
@@ -1560,57 +1470,71 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 1 - Normal\n 2 - Tunel de espinhos\n 3 - Terra da Speranza (LSD World) \n 4 - Paz e Amor\n 5 - Luz, luz!\n 6 - Noir\n 7 - Alem do Infinito\n");
+    printf("Digite o numero da opcao e tecle Enter\n 0 - Normal\n 1 - Tunel de espinhos\n 2 - Terra da Speranza (LSD World) \n 3 - Paz e Amor\n 4 - Luz, luz!\n 5 - Preto no Branco\n 6 - Tudo azul...\n");
     scanf("%d", &letra);
-    if(letra == 1 || letra == 666)
-    {
+
+    switch(letra){
+        case 0:
         WIDTH = 1200;
         HEIGHT = 600;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
-    if(letra == 2)
-    {
+        break;
+
+        case 1:
         WIDTH = 500;
         HEIGHT = 655;
         back_x = WIDTH*0.3;
         back_y = HEIGHT*0.5;
-    }
-    if(letra == 3)
-    {
+        break;
+
+        case 2:
         WIDTH = 400;
         HEIGHT = 500;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
-    if(letra == 4)
-    {
+        break;
+
+        case 3:
         WIDTH = 400;
         HEIGHT = 500;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
-    if(letra == 5)
-    {
+        break;
+
+        case 4:
         WIDTH = 500;
         HEIGHT = 500;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
-    if(letra == 6)
-    {
+        break;
+
+        case 5:
         WIDTH = 500;
         HEIGHT = 711;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
-    if(letra == 7)
-    {
+        break;
+
+        case 6:
         WIDTH = 400;
         HEIGHT = 400;
         back_x = WIDTH/2;
         back_y = HEIGHT/2;
-    }
+        break;
+
+        case 666:
+        WIDTH = 1200;
+        HEIGHT = 600;
+        back_x = WIDTH/2;
+        back_y = HEIGHT/2;
+        break;
+
+        default:
+        printf("Incorreto!");
+        break;
+    } //final do switch
+
 }
 
 #endif // FUNCTIONS_H_INCLUDED

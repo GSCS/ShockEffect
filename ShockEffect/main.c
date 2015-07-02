@@ -45,8 +45,6 @@ int main()
     int letra;
     OpcaoBackground(letra);
 
-    bool over = false;
-
     //primitive variables
     int NUM_ENEMYRED = 10; //quantidade de inimigos vermelhos
     int NUM_ENEMYBLUE = 10; //quantidade de inimigos azuis
@@ -326,16 +324,8 @@ int main()
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                 {
                     tela = TELA_FINAL;
-                    over = false;
                     break;
                 }
-            }
-
-            if(over == true)
-            {
-                tela = TELA_FINAL;
-                over = false;
-                break;
             }
 
             //se clicar para fechar a janela
@@ -384,7 +374,7 @@ int main()
                 PlayerColisionObstacle(player,obstacle);
                 PlayerColisionBoss(player, boss, &NUM_BOSS);
 
-                ResetPlayer(over, player, enemyred, &NUM_ENEMYRED,
+                ResetPlayer(&tela, player, enemyred, &NUM_ENEMYRED,
                             enemyblue, &NUM_ENEMYBLUE, obstacle,
                             boss, &NUM_BOSS, &text_color,
                             musica3, &musica3id,
@@ -507,6 +497,7 @@ int main()
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                     tela = TELA_INICIO;
             }
+
             switch(letra)
             {
 

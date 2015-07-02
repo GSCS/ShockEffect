@@ -9,7 +9,7 @@ void DrawScientist(Player &player, SpriteScientist &scientist, bool *LEFT, bool 
 void PlayerJump(Player &player, bool *UP);
 void PlayerRight(Player &player, bool *RIGHT, struct SpriteScientist &scientist);
 void PlayerLeft(Player &player, bool *LEFT);
-void ResetPlayer(bool over, Player &player, Enemy_red enemyred[], int *num_enemyred,
+void ResetPlayer(int *tela, Player &player, Enemy_red enemyred[], int *num_enemyred,
                  Enemy_blue enemyblue[], int *num_enemyblue, Obstacle &obstacle,
                  Boss boss[], int *num_boss, int *text_color,
                  ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id,

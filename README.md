@@ -1,6 +1,8 @@
-# Game-C - ("Working Title")
+# SHOCK EFFECT
 
-##Objetivo
+![](https://raw.githubusercontent.com/GSCS/ShockEffect/master/ShockEffect/images/logo3.png)
+
+##Objetivos
 Desenvolver Game (educativo) em Linguagem C com biblioteca Allegro(5), sendo a ordem de metas:
 * 1. Fazer um jogo
 * 2. De preferência (~~educativo~~) divertido
@@ -12,10 +14,10 @@ Desenvolver Game (educativo) em Linguagem C com biblioteca Allegro(5), sendo a o
 * 8. [Ser um ~~Dong Nguyen~~ programador de sucesso (mesmo?)]
 
 ##Descrição geral
-Game Estilo "Endless Running"
+Game Estilo "Endless Running" 
+
+(baseado em jogos como Dyad e Race the Sun - embora a versão final não seja muito semelhante...)
 
 * Developed by: GSimas (Gustavo Simas) & Clasr (Clarice ~~Scheiβe~~ Scheibe)
 * Built for: Everybody
-* Supported by: ...
-.
-...
+* Supported by: (quem mesmo?)

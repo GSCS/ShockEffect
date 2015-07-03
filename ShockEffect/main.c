@@ -40,20 +40,18 @@ const int TELA_PAUSE = 4;
 //main
 int main()
 {
-    int tela = TELA_INICIO;
-    int b;
-    int letra;
-    OpcaoBackground(letra);
-
-    //primitive variables
-    int NUM_ENEMYRED = 10; //quantidade de inimigos vermelhos
-    int NUM_ENEMYBLUE = 10; //quantidade de inimigos azuis
-    int NUM_BOSS = 5;
+    //primitive variables////////////////////////////////////////////////////
+    int tela = TELA_INICIO; //definição da tela inicial
     int text_color = 255; //variavel para cor (animacao inicial de jogo - efeito relampago)
     int text_boss = 255; //variavel para cor de texto boss
-    int FPS = 60; //frames per second
     bool done = false;
     bool redraw = true;
+    int letra; //variavel que grava a escolha do background
+    int b; //variavel "curinga"
+    //Quantidade máxima de inimigos
+    int NUM_ENEMYRED = 10; //quantidade máxima de inimigos vermelhos
+    int NUM_ENEMYBLUE = 10; //quantidade máxima de inimigos azuis
+    int NUM_BOSS = 5; //quantidade máxima de boss
 
     //object variables
     struct Player player;
@@ -78,6 +76,7 @@ int main()
     ALLEGRO_DISPLAY *display;
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
     ALLEGRO_TIMER *timer = NULL;
+
     ALLEGRO_SAMPLE *musica0 = NULL;
     ALLEGRO_SAMPLE *musica1 = NULL;
     ALLEGRO_SAMPLE *musica2 = NULL;
@@ -94,18 +93,25 @@ int main()
     ALLEGRO_FONT *medium_font = NULL;
 
 ////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+    //função para escolha de background/////////////
+    OpcaoBackground(letra);
+    ////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////
+    //verificacoes de erro e inicializações///////////////////
 
-    //verificacoes de erro
+    //Inicialização do allegro
     if(!al_init())
         return -1; //caso de erro ao inicializar allegro
-
+    //Inicialização display
     display = al_create_display(WIDTH,HEIGHT); //criar display
-
     if(!display)
         return -1; //se der merda
 
     //Allegro Module Init
     al_init_primitives_addon();
+
+    //addons relacionados a fonte
     al_init_font_addon();
     if (!al_init_ttf_addon())
     {
@@ -129,19 +135,23 @@ int main()
         return -1;
     }
 
+    //desenhar "carregando na tela"//////////////////////////////////////////////////
     al_draw_text(title_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.1, ALLEGRO_ALIGN_CENTRE, "SHOCK EFFECT");
     al_draw_text(title_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.3, ALLEGRO_ALIGN_CENTRE, "LOADING...");
     al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.5, ALLEGRO_ALIGN_CENTRE, "99%");
     al_flip_display();
 
+    //inicialização teclado
     al_install_keyboard();
 
+    //inicialização addon de imagem
     if(!al_init_image_addon())
     {
         printf("Falha ao inicializar image addon");
         return -1;
     }
 
+    //inicialização audio
     al_install_audio();
     if(!al_install_audio())
     {
@@ -149,6 +159,7 @@ int main()
         return -1;
     }
 
+    //inicialização addon acodec (relacionado a audio)
     al_init_acodec_addon();
     if(!al_init_acodec_addon())
     {
@@ -156,6 +167,7 @@ int main()
         return -1;
     }
 
+    //reserva amostras de som para serem tocadas
     al_reserve_samples(6); //reserva amostras de som para serem tocadas
     if(!al_reserve_samples(6))
     {
@@ -163,12 +175,14 @@ int main()
         return -1;
     }
 
-    //ALLEGRO QUEUE
+    //ALLEGRO QUEUE (eventos)
     event_queue = al_create_event_queue();
     timer = al_create_timer(1.0 / FPS);
 
-    //Inicializacao de objetos
+    //////////////////////////////////////////////////////////////////////////////
+    //Inicializacao de objetos///////////////////////////////////////////////////
 
+    //Inicializar tiro Q
     InitShootQ(shootQ, letra); //funcao que inicializa disparo 1 (capacitor)
     if(!shootQ.bitmap)
     {
@@ -177,6 +191,7 @@ int main()
         return -1;
     }
 
+    //inicializar tiro W
     InitShootW(shootW, letra); //funcao que inicializa disparo 2 (indutor)
     if(!shootW.bitmap)
     {
@@ -185,6 +200,7 @@ int main()
         return -1;
     }
 
+    //inicializar tiro E
     InitShootE(shootE); //funcao que inicializa habilidade de escudo (shield / resistor)
     if(!shootE.bitmap)
     {
@@ -193,6 +209,7 @@ int main()
         return -1;
     }
 
+    //Inicializar sprite do jogador
     InitScientist(scientist);
     scientist.bitmap = al_load_bitmap("images/scientist.png");
     if (!scientist.bitmap)
@@ -202,6 +219,7 @@ int main()
         return -1;
     }
 
+    //outras inicializações
     InitPlayer(player, &text_color); //funcao que "inicia" player
     InitEnemyRed(enemyred, &NUM_ENEMYRED, letra); //funcao que inicia enemyred
     InitEnemyBlue(enemyblue, &NUM_ENEMYBLUE, letra); //funcao que inicia enemyblue
@@ -237,34 +255,42 @@ int main()
 
     printf("tudo certo");
 
-    //ALLEGRO REGISTER
+    //ALLEGRO REGISTER///////////////////////////////////////////////////////
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     al_start_timer(timer);
 
+    /////////////////////////////////////////////////////////////////////////////
+    //Escrever na tela DEU//////////////////////////////////////////////////////
     al_draw_text(medium_font, al_map_rgb(255, 255, 255), WIDTH/2, HEIGHT*0.9, ALLEGRO_ALIGN_CENTRE, "Deu!");
     al_flip_display();
 
-    //Loop do jogo
+    /////////////////////////////////////////////////////////////////////////////
+    //Loop do jogo///////////////////////////////////////////////////////////////
     while (!done)
     {
+        //definir evento do allegro
         ALLEGRO_EVENT ev;
+        //switch para opções de tela (inicio, intrução, jogo e final)
         switch(tela)
         {
-/////////////////////////////////////////////////////////////////////////////////
-        case TELA_INICIO:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        case TELA_INICIO: //tela inicial com titulo do jogo
 
+            //esperar evento
             al_wait_for_event(event_queue, &ev);
+            //se o evento for fechar o display fecha o display
             if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 done = true;
-
+            //se o evento for enter define a variavel tela para próxima tela
             if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
             {
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                     tela = TELA_INSTRU;
             }
-
+            //desenhar tela de inicio
             switch(letra)
             {
             case 0:
@@ -295,19 +321,21 @@ int main()
 
             al_flip_display();
             break;
-//////////////////////////////////////////////////////////////////////////////////////
-        case TELA_INSTRU:
-
+        ///////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        case TELA_INSTRU://tela com instruções sobre como jogar
+        //esperar evento
             al_wait_for_event(event_queue, &ev);
+            //se o evento for fechar o display fecha o display
             if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 done = true;
-
+            //se o evento for enter define a variavel tela como próxima tela
             if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
             {
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                     tela = TELA_JOGO;
             }
-
+            //desenha tela de instrução
             if(letra == 0 || letra == 666)
                 al_draw_bitmap(background0.image[13], 0, 0, 0);
             else
@@ -315,27 +343,19 @@ int main()
             al_flip_display();
             break;
 
-//////////////////////////////////////////////////////////////////////////////////
-        case TELA_JOGO:
-
+        ///////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        case TELA_JOGO://Tela do jogo, inicia o jogo em si
+            //esperar evento
             al_wait_for_event(event_queue, &ev);
-
-            if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
-            {
-                if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
-                {
-                    tela = TELA_FINAL;
-                    break;
-                }
-            }
-
-            //se clicar para fechar a janela
+            //se o evento for fechar o display fecha o display
             if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 done = true;
 
             //evento do timer (vai entrar nesse else if sempre, a nao ser que feche a janela)
             else if(ev.type == ALLEGRO_EVENT_TIMER)
             {
+                //define a variavel redraw como true para habilitar o desenho do jogo
                 redraw = true;
 
                 if(keys[RIGHT] && !player.moving)
@@ -350,6 +370,9 @@ int main()
                     player.moving = true;
                 }
 
+                //ResetKeys(player, &keys[UP], &keys[RIGHT], &keys[LEFT], &keys[Q], &keys[W], &keys[E]);
+
+                //funções de movimentação e variação da musica ou cor do texto
                 ChangeColor(&text_color, player, boss, &NUM_BOSS, &text_boss);
                 PlayerJump(player, &keys[UP]);
                 PlayerRight(player, &keys[RIGHT], scientist);
@@ -357,7 +380,7 @@ int main()
                 PlayerSample(player, letra, &musica3id, musica3);
                 BossSample(boss, &NUM_BOSS, letra, &musica1id, musica1, &musica666id, musica666);
 
-                //updates
+                //updates: atualizar objetos
                 UpdateShootQ(shootQ, player);
                 UpdateShootW(shootW, player);
                 UpdateShootE(shootE, player);
@@ -367,7 +390,7 @@ int main()
                 UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue,
                            &NUM_ENEMYBLUE, letra);
 
-                //colisoes
+                //colisoes: testar colisões
                 ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);
                 ShootWColisionEnemyBlue(shootW, enemyblue, &NUM_ENEMYBLUE, player);
                 ShootColisionBoss(shootW, shootQ, boss, &NUM_BOSS, player);
@@ -376,13 +399,20 @@ int main()
                 PlayerColisionObstacle(player,obstacle);
                 PlayerColisionBoss(player, boss, &NUM_BOSS);
 
+                //Reset Player, verifica se o player está morto
+                //se estiver morto reseta todos os objetos
+                //e define a variavel tela como tela final
                 ResetPlayer(&tela, player, enemyred, &NUM_ENEMYRED,
                             enemyblue, &NUM_ENEMYBLUE, obstacle,
                             boss, &NUM_BOSS, &text_color,
                             musica3, &musica3id,
-                            musica666, &musica666id, letra);
+                            musica666, &musica666id, letra,
+                            &keys[UP], &keys[RIGHT], &keys[LEFT],
+                            &keys[Q], &keys[W], &keys[E]);
             }
-
+             ///////////////////////////////////////////////////
+            //se o evento for um apertar de teclas/////////////
+            //define tecla como abaixada e inicializa função para ela se houver
             else if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
             {
                 switch(ev.keyboard.keycode)
@@ -413,7 +443,7 @@ int main()
                     break;
                 }
             }
-
+            //se o evento for o não apertar de teclas define elas como false
             else if(ev.type == ALLEGRO_EVENT_KEY_UP)
             {
                 switch(ev.keyboard.keycode)
@@ -441,11 +471,13 @@ int main()
                 }
             }
 
+            //se não tiver mais eventos para acontecer desenha os objetos no display
             if(redraw && al_is_event_queue_empty(event_queue))
             {
+                //define variavel que habilita o desenho como false
                 redraw = false;
 
-                //desenhar objetos
+                //desenha o background escolhido
                 switch (letra)
                 {
                 case 0:
@@ -474,6 +506,7 @@ int main()
                     break;
                 }
 
+                //desenha os outros objetos
                 DrawText(title_font, medium_font, player, boss, &NUM_BOSS, &text_color, &text_boss, obstacle);
                 DrawShootQ(shootQ, letra, boss);
                 DrawShootW(shootW, letra, boss);
@@ -487,19 +520,22 @@ int main()
                 al_flip_display();
             }
             break;
-//////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
+        //se tela for a tela final
         case TELA_FINAL:
-
+            //espera por evento
             al_wait_for_event(event_queue, &ev);
+            //se o evento for fechar o display fecha o display
             if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 done = true;
-
+            //se o evento for enter deifine tela como próxima tela
             if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
             {
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                     tela = TELA_INICIO;
             }
 
+            //desenha a tela final
             switch(letra)
             {
 
@@ -533,10 +569,10 @@ int main()
 
             break;
         } //final do switch
-    } //final do while
+    } //final do while/////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
 
-    //destroi coisas
-
+    //destroi coisas////////////////////////////////////////////////
     al_destroy_event_queue(event_queue);
     al_destroy_timer(timer);
     al_destroy_font(title_font);

@@ -39,7 +39,7 @@ void InitPlayer(Player &player, int *text_color)
     player.lives = 5;
     player.speed = 7;
     player.jumpSpeed = 15;
-    player.jump = true;
+    player.jump = false;
     player.moving = false;
     player.colision = false;
     player.alive = true;
@@ -67,19 +67,19 @@ void InitPlayer(Player &player, int *text_color)
 
 void PlayerSample(Player &player, int letra, ALLEGRO_SAMPLE_ID *musica3id, ALLEGRO_SAMPLE *musica3)
 {
-    if(letra == 4)
+    if(letra == 3)
     {
         if(!player.alive)
         {
-            al_stop_sample_instance(player.instance[0]);
-            al_play_sample(musica3, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica3id);
+            al_stop_sample_instance(player.instance[1]);
         }
 
         if(player.lives == 2)
         {
-            al_stop_sample(musica3id);
+            //al_stop_sample(musica3id);
             al_play_sample_instance(player.instance[0]);
         }
+
         if(player.lives == 1)
         {
             al_stop_sample_instance(player.instance[0]);
@@ -203,7 +203,7 @@ void ResetPlayer(int *tela, Player &player, Enemy_red enemyred[],
                  Obstacle &obstacle, Boss boss[], int *num_boss, int *text_color,
                  ALLEGRO_SAMPLE *musica3, ALLEGRO_SAMPLE_ID *musica3id,
                  ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id,
-                 int letra)
+                 int letra, bool *UP, bool *RIGHT, bool *LEFT, bool *Q, bool *W, bool *E)
 {
     int j;
     if(player.lives <= 0)
@@ -261,10 +261,29 @@ void ResetPlayer(int *tela, Player &player, Enemy_red enemyred[],
             al_stop_sample_instance(boss[j].instance[0]);
             al_stop_sample_instance(boss[j].instance[1]);
             if(letra == 666)
-            al_stop_sample_instance(boss[j].instance[2]);
+                al_stop_sample_instance(boss[j].instance[2]);
         }
         obstacle.score = 5;
+        *UP = false;
+        *RIGHT = false;
+        *LEFT = false;
+        *Q = false;
+        *W = false;
+        *E = false;
         *tela = TELA_FINAL;
+    }
+}
+
+void ResetKeys(struct Player &player, bool *UP, bool *RIGHT, bool *LEFT, bool *Q, bool *W, bool *E)
+{
+    if(player.alive == false)
+    {
+        *UP = false;
+        *RIGHT = false;
+        *LEFT = false;
+        *Q = false;
+        *W = false;
+        *E = false;
     }
 }
 
@@ -953,6 +972,7 @@ void InitBoss(struct Boss boss[], int *num_boss, int letra)
             boss[j].sample[2] = al_load_sample("sounds/starwars.ogg");
             boss[j].instance[2] = al_create_sample_instance(boss[j].sample[2]);
             al_attach_sample_instance_to_mixer(boss[j].instance[2], al_get_default_mixer());
+            al_set_sample_instance_gain(boss[j].instance[2], 3);
         }
         boss[j].x = back_x;
         boss[j].y = back_y;
@@ -977,6 +997,8 @@ void InitBoss(struct Boss boss[], int *num_boss, int letra)
         boss[j].instance[1] = al_create_sample_instance(boss[j].sample[1]);
         al_attach_sample_instance_to_mixer(boss[j].instance[0], al_get_default_mixer());
         al_attach_sample_instance_to_mixer(boss[j].instance[1], al_get_default_mixer());
+        al_set_sample_instance_gain(boss[j].instance[0], 2);
+        al_set_sample_instance_gain(boss[j].instance[1], 2);
 
     }
 }
@@ -999,7 +1021,7 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
                 int *num_enemyred, struct Enemy_blue enemyblue[], int *num_enemyblue, int letra)
 {
     *num_boss = 0;
-    if(player.score > 2 && boss[0].lived == false)
+    if(player.score > 20 && boss[0].lived == false)
     {
         boss[0].alive = true;
         *num_boss = 1;
@@ -1083,7 +1105,6 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             }
             if(letra == 1)
             {
-                al_stop_sample(musica1id);
                 al_play_sample_instance(boss[j].instance[1]);
             }
             if(letra == 666)
@@ -1096,19 +1117,18 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
         {
             switch(letra)
             {
-                case 1:
+            case 1:
                 boss[j].instance_played = true;
                 al_stop_sample_instance(boss[j].instance[1]);
-                al_stop_samples();
-                al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
                 break;
-                case 666:
+            case 666:
                 al_stop_sample_instance(boss[j].instance[2]);
                 boss[j].instance_played = true;
                 break;
+            }
         }
     }
-}}
+}
 
 //funcao para colisao de player com boss
 void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss)

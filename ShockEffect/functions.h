@@ -52,8 +52,11 @@ void PlayerColisionEnemyBlue(struct Player &player, struct Enemy_blue enemyblue[
 //funções Boss
 void InitBoss(struct Boss boss[], int *num_boss, int letra);
 void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player);
-void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_red, struct Enemy_blue enemyblue[], int *num_blue, int letra);
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666);
+void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player,
+                struct Enemy_red enemyred[], int *num_red, struct Enemy_blue enemyblue[],
+                int *num_blue, int letra);
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1,
+                ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666);
 void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss);
 void ShootColisionBoss(struct Shoot &shootW, struct Shoot &shootQ, struct Boss boss[], int *num_boss, struct Player &player);
 

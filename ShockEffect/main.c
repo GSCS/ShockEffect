@@ -264,6 +264,7 @@ int main()
                 if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
                     tela = TELA_INSTRU;
             }
+
             switch(letra)
             {
             case 0:
@@ -363,7 +364,8 @@ int main()
                 UpdateEnemyRed(enemyred, &NUM_ENEMYRED, player, shootQ);
                 UpdateEnemyBlue(enemyblue, &NUM_ENEMYBLUE, player, shootW);
                 UpdateObstacle(obstacle, medium_font, player);
-                UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue, &NUM_ENEMYBLUE, letra);
+                UpdateBoss(boss, &NUM_BOSS, &text_boss, player, enemyred, &NUM_ENEMYRED, enemyblue,
+                           &NUM_ENEMYBLUE, letra);
 
                 //colisoes
                 ShootQColisionEnemyRed(shootQ,enemyred, &NUM_ENEMYRED, player);

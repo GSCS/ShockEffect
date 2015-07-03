@@ -258,18 +258,15 @@ void ResetPlayer(int *tela, Player &player, Enemy_red enemyred[],
             boss[j].alive = false;
             boss[j].lived = false;
             boss[j].instance_played = false;
-            /*al_stop_sample_instance(boss[j].instance[0]);
+            al_stop_sample_instance(boss[j].instance[0]);
             al_stop_sample_instance(boss[j].instance[1]);
             if(letra == 666)
-            al_stop_sample_instance(boss[j].instance[2]);*/
+            al_stop_sample_instance(boss[j].instance[2]);
         }
-        if(letra == 666)
-            al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica666id);
         obstacle.score = 5;
         *tela = TELA_FINAL;
     }
 }
-
 
 //funcoes poder indutor "Q"//////////////////////////////////////////////////
 //funcao para iniciar tiro Q
@@ -998,10 +995,11 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
 }
 
 //funcao para atualizar boss
-void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[], int *num_enemyred, struct Enemy_blue enemyblue[], int *num_enemyblue, int letra)
+void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player &player, struct Enemy_red enemyred[],
+                int *num_enemyred, struct Enemy_blue enemyblue[], int *num_enemyblue, int letra)
 {
     *num_boss = 0;
-    if(player.score > 20 && boss[0].lived == false)
+    if(player.score > 2 && boss[0].lived == false)
     {
         boss[0].alive = true;
         *num_boss = 1;
@@ -1070,19 +1068,20 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
     }
 }
 
-void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666)
+void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID *musica1id, ALLEGRO_SAMPLE *musica1,
+                ALLEGRO_SAMPLE_ID *musica666id, ALLEGRO_SAMPLE *musica666)
 {
     int j;
     for(j=0; j < *num_boss; j++)
     {
         if(boss[j].alive)
         {
-            if(boss[j].instance_played == false && letra == 4)
+            if(boss[j].instance_played == false && letra == 3)
             {
                 al_play_sample_instance(boss[j].instance[0]);
                 boss[j].instance_played = true;
             }
-            if(letra == 2)
+            if(letra == 1)
             {
                 al_stop_sample(musica1id);
                 al_play_sample_instance(boss[j].instance[1]);
@@ -1095,7 +1094,7 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
         }
         if(boss[j].lived && !boss[j].instance_played)
         {
-            if(letra == 2)
+            if(letra == 1)
             {
                 al_stop_sample_instance(boss[j].instance[1]);
                 al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
@@ -1104,7 +1103,6 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             if(letra == 666)
             {
                 al_stop_sample_instance(boss[j].instance[2]);
-                al_play_sample(musica666, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica666id);
                 boss[j].instance_played = true;
             }
         }

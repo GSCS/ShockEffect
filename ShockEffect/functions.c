@@ -183,6 +183,7 @@ void PlayerRight(struct Player &player, bool *RIGHT, struct SpriteScientist &sci
 {
     if(*RIGHT && !((player.x + scientist.frameWidth) >= WIDTH))
     {
+        player.velx = player.speed;
         player.x += player.velx;
         player.moving = true;
     }
@@ -192,6 +193,7 @@ void PlayerLeft(struct Player &player, bool *LEFT)
 {
     if(*LEFT && ((player.x > 1)))
     {
+        player.velx = player.speed;
         player.x -= player.velx;
         player.moving = true;
     }

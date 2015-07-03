@@ -358,18 +358,6 @@ int main()
                 //define a variavel redraw como true para habilitar o desenho do jogo
                 redraw = true;
 
-                if(keys[RIGHT] && !player.moving)
-                {
-                    player.velx = player.speed;
-                    player.moving = true;
-                }
-
-                if(keys[LEFT] && !player.moving)
-                {
-                    player.velx = player.speed;
-                    player.moving = true;
-                }
-
                 //ResetKeys(player, &keys[UP], &keys[RIGHT], &keys[LEFT], &keys[Q], &keys[W], &keys[E]);
 
                 //funções de movimentação e variação da musica ou cor do texto

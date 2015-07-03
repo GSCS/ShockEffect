@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1435884853 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.c
+1435891696 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.c
 	<stdlib.h>
 	<stdio.h>
 	<allegro5/allegro.h>
@@ -260,9 +260,9 @@
 
 1362338300 c:\users\gustavo\documents\ifsc\0-softwares\codeblocks\allegro-5.0.10-mingw-4.7.0\include\allegro5\allegro_image.h
 
-1435847001 c:\users\gustavo\documents\github\shockeffect\shockeffect\objects.h
+1435887403 c:\users\gustavo\documents\github\shockeffect\shockeffect\objects.h
 
-1435884789 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\main.c
+1435891614 source:c:\users\gustavo\documents\github\shockeffect\shockeffect\main.c
 	<stdlib.h>
 	<stdio.h>
 	<allegro5/allegro.h>
@@ -277,5 +277,5 @@
 	"objects.h"
 	"functions.h"
 
-1435884545 c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.h
+1435891574 c:\users\gustavo\documents\github\shockeffect\shockeffect\functions.h
 

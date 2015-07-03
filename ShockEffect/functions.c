@@ -1088,26 +1088,27 @@ void BossSample(struct Boss boss[], int *num_boss, int letra, ALLEGRO_SAMPLE_ID 
             }
             if(letra == 666)
             {
-                al_stop_sample(musica666id);
+                //al_stop_sample(musica666id);
                 al_play_sample_instance(boss[j].instance[2]);
             }
         }
         if(boss[j].lived && !boss[j].instance_played)
         {
-            if(letra == 1)
+            switch(letra)
             {
-                al_stop_sample_instance(boss[j].instance[1]);
-                al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
+                case 1:
                 boss[j].instance_played = true;
-            }
-            if(letra == 666)
-            {
+                al_stop_sample_instance(boss[j].instance[1]);
+                al_stop_samples();
+                al_play_sample(musica1, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, musica1id);
+                break;
+                case 666:
                 al_stop_sample_instance(boss[j].instance[2]);
                 boss[j].instance_played = true;
-            }
+                break;
         }
     }
-}
+}}
 
 //funcao para colisao de player com boss
 void PlayerColisionBoss(struct Player &player, struct Boss boss[], int *num_boss)
@@ -1478,7 +1479,7 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 0 - Normal\n 1 - Tunel de espinhos\n 2 - Terra da Speranza (LSD World) \n 3 - Paz e Amor\n 4 - Luz, luz!\n 5 - Preto no Branco\n 6 - Tudo azul...\n");
+    printf("Digite o numero da opcao e tecle Enter\n 0 - Normal\n 1 - Tunel de espinhos\n 2 - Terra da Speranza (LSD World) \n 3 - Paz e Amor\n 4 - Luz, luz!\n 5 - Preto no Branco\n 6 - Alem do Infinito\n");
     scanf("%d", &letra);
 
     switch(letra)

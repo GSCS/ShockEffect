@@ -72,7 +72,8 @@ void DrawText(ALLEGRO_FONT *title_font, ALLEGRO_FONT *medium_font, Player &playe
 
 //funcoes para background
 void OpcaoBackground(int &letra);
-void InitBackground0(struct Sprite &background0, ALLEGRO_SAMPLE *musica0, ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id, int letra);
+void InitBackground0(struct Sprite &background0, ALLEGRO_SAMPLE *musica0,
+                     ALLEGRO_SAMPLE *musica666, ALLEGRO_SAMPLE_ID *musica666id, int letra);
 void DrawBackground0(struct Sprite &background0);
 void InitBackground1(struct Sprite &background1, ALLEGRO_SAMPLE *musica1, ALLEGRO_SAMPLE_ID *musica1id);
 void DrawBackground1(struct Sprite &background1);

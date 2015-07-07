@@ -550,7 +550,7 @@ void DrawEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player &
                     enemyred_sprite.frame_atual = 0;
                 enemyred_sprite.frame_count = 0;
             }
-            al_draw_scaled_bitmap(enemyred[j].image, 0, 0, back_x, back_y, enemyred[j].x, enemyred[j].y, enemyred[j].boundx, enemyred[j].boundy, 0);
+            al_draw_scaled_bitmap(enemyred[j].image, 0, 0, enemyred[j].width, enemyred[j].height, enemyred[j].x, enemyred[j].y, enemyred[j].boundx, enemyred[j].boundy, 0);
         }
         else if(enemyred[j].alive == false)
         {
@@ -604,7 +604,7 @@ void UpdateEnemyRed(struct Enemy_red enemyred[], int *num_enemies, struct Player
         }
         if(enemyred[j].alive)
         {
-            enemyred[j].boundx = enemyred[j].size_enemy*2;
+            enemyred[j].boundx = enemyred[j].size_enemy;
             enemyred[j].boundy = enemyred[j].size_enemy;
             enemyred[j].velx += enemyred[j].speedx;
             enemyred[j].vely += enemyred[j].speed;
@@ -655,7 +655,7 @@ void DrawEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Playe
     {
         if(enemyblue[j].alive && player.score >= 6)
         {
-            al_draw_scaled_bitmap(enemyblue[j].image, 0, 0, back_x, back_y, enemyblue[j].x, enemyblue[j].y, enemyblue[j].boundx, enemyblue[j].boundy, 0);
+            al_draw_scaled_bitmap(enemyblue[j].image, 0, 0, enemyblue[j].width, enemyblue[j].height, enemyblue[j].x, enemyblue[j].y, enemyblue[j].boundx, enemyblue[j].boundy, 0);
         }
         else if(enemyblue[j].alive == false)
         {
@@ -701,7 +701,7 @@ void UpdateEnemyBlue(struct Enemy_blue enemyblue[], int *num_enemies, struct Pla
         }
         if(enemyblue[j].alive)
         {
-            enemyblue[j].boundx = enemyblue[j].size_enemy*4;
+            enemyblue[j].boundx = enemyblue[j].size_enemy*2;
             enemyblue[j].boundy = enemyblue[j].size_enemy*2;
             enemyblue[j].size_enemy += enemyblue[j].speed;
             enemyblue[j].velx = enemyblue[j].speedx;
@@ -1013,7 +1013,7 @@ void DrawBoss(struct Boss boss[], int *num_boss, struct Player &player)
     {
         if(boss[j].alive)
         {
-            al_draw_scaled_bitmap(boss[j].image, 0, 0, back_x, back_y, boss[j].x, boss[j].y, boss[j].boundx, boss[j].boundy, 0);
+            al_draw_scaled_bitmap(boss[j].image, 0, 0, boss[j].width, boss[j].height, boss[j].x, boss[j].y, boss[j].boundx, boss[j].boundy, 0);
         }
     }
 }
@@ -1068,7 +1068,7 @@ void UpdateBoss(struct Boss boss[], int *num_boss, int *text_boss, struct Player
         }
         if(boss[j].alive)
         {
-            boss[j].boundx = boss[j].size_boss*4;
+            boss[j].boundx = boss[j].size_boss*2;
             boss[j].boundy = boss[j].size_boss*2;
 
             for(k=0; k < *num_enemyred; k++)
@@ -1424,7 +1424,7 @@ void InitBackground5(struct Sprite &background5, ALLEGRO_SAMPLE *musica5)
     background5.image[20] = al_load_bitmap("images/telas/tela-inicio5.png");
     background5.image[22] = al_load_bitmap("images/telas/tela-final5.png");
     //carregar musica referente
-    musica5 = al_load_sample("sounds/starwars.ogg");
+    musica5 = al_load_sample("sounds/qotsa.ogg");
     al_play_sample(musica5, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 }
 
@@ -1501,7 +1501,7 @@ void InitEnemyredSprite(struct Sprite &enemyred_sprite)
 
 void OpcaoBackground(int &letra)
 {
-    printf("Digite o numero da opcao e tecle Enter\n 0 - Normal\n 1 - Tunel de espinhos\n 2 - Terra da Speranza (LSD World) \n 3 - Paz e Amor\n 4 - Luz, luz!\n 5 - Preto no Branco\n 6 - Alem do Infinito\n");
+    printf("Digite o numero da opcao e tecle Enter\n 0 - Normal\n 1 - Tunel de espinhos\n 2 - Terra da Speranza (LSD World) \n 3 - Paz e Amor\n 4 - Luz, luz!\n 5 - Noir\n 6 - Alem do Infinito\n");
     scanf("%d", &letra);
 
     switch(letra)

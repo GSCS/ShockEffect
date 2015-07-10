@@ -573,12 +573,24 @@ int main()
     al_destroy_sample(player.sample[2]);
     al_destroy_sample(player.sample[3]);
     al_destroy_sample(player.sample[4]);
+    al_destroy_sample(player.sample[5]);
+    al_destroy_sample(player.sample[6]);
     al_destroy_bitmap(scientist.bitmap);
     al_destroy_bitmap(shootE.bitmap[0]);
+    if(letra !=666)
     al_destroy_bitmap(shootQ.bitmap[0]);
-    al_destroy_bitmap(shootQ.bitmap[1]);
-    al_destroy_bitmap(shootQ.bitmap[2]);
+    if(letra == 666)
+    {
+        al_destroy_bitmap(shootQ.bitmap[1]);
+        al_destroy_bitmap(shootQ.bitmap[2]);
+    };
+    if(letra !=666)
     al_destroy_bitmap(shootW.bitmap[0]);
+    if(letra == 666)
+    {
+        al_destroy_bitmap(shootW.bitmap[1]);
+        al_destroy_bitmap(shootW.bitmap[2]);
+    };
     for(b=0; b<NUM_ENEMYRED; b++)
         al_destroy_bitmap(enemyred[b].image);
     for(b=0; b<NUM_ENEMYBLUE; b++)

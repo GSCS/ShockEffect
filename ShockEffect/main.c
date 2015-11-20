@@ -89,6 +89,8 @@ int main()
     ALLEGRO_SAMPLE_ID musica1id;
     ALLEGRO_SAMPLE_ID musica666id;
 
+    ALLEGRO_BITMAP *menu = NULL;
+
     ALLEGRO_FONT *title_font = NULL;
     ALLEGRO_FONT *medium_font = NULL;
 
